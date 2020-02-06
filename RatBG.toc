@@ -1,0 +1,16 @@
+## Interface: 11303
+## Title: Rat BG Targets
+## Notes: A functioning enemy tracker for Battlegrounds
+## Author: Rat, with inspiration from BGTargets(kunda, fix by Leming)
+## Version: 11303-1
+## SavedVariables: RatDB
+## SavedVariablesPerCharacter: RatPrivateDB 
+
+Libs\Libs.xml
+init.lua
+Settings\Settings.xml
+Core\Core.xml
+Media\Media.xml
+Frames\Frames.xml
+
+

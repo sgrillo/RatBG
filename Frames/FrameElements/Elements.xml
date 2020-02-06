@@ -1,0 +1,11 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="Health.lua"/>
+  <Script file="CastBar.lua"/>
+  <Script file="Class.lua"/>
+  <Script file="Name.lua"/>
+  <Script file="Power.lua"/>
+  <Script file="Rank.lua"/>
+  <Script file="Skull.lua"/>
+  <Script file="TargetCount.lua"/>
+  <Script file="Trinket.lua"/>
+</Ui>
