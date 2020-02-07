@@ -16,7 +16,3 @@ T.RatBlue = {
 	hex = "3291BA",
 	displayText = "|cFF3291BA"
 }
-
-T.bgFrames = {
-	flagOffsetMinMax = function() return {min = -R.db.bgFrames.flag.flagSize, max =R.db.bgFrames.frameWidth} end,
-}
