@@ -47,7 +47,6 @@ R.Options.args.BattlegroundBars = {
 					get = function() return tonumber(R.db.bgFrames.frameWidth) end,
 					set = function(info,value) 
 						R.db.bgFrames[info[#info]] = value
-						R.db.bgFrames.flag.flagOffsetMax = value + R.db.bgFrames.flag.flagSize
 					end
 				},
 				frameHeight = {
@@ -291,6 +290,10 @@ R.Options.args.BGFocus = {
 	}
 }
 
+local function flagOffsetMin() return -R.db.bgFrames.flag.flagSize or 0 end
+
+local function flagOffsetMax() return R.db.bgFrames.frameWidth or 100 end
+
 R.Options.args.WSG = {
 	order = 3,
 	type = "group",
@@ -324,9 +327,9 @@ R.Options.args.WSG = {
 					order = 3,
 					name = "Flag Offset",
 					type = "range",
-					dynamic = true,
-					min = 0,
-					max = 100,
+					dialogControl = "Slider-Variable",
+					min = flagOffsetMin,
+					max = flagOffsetMax,
 					step = 1,
 					disabled = function() return not R.db.bgFrames.flag.trackFlag end,
 					get = function(info) return tonumber(R.db.bgFrames.flag[info[#info]]) end,
@@ -345,8 +348,3 @@ R.Options.args.AB = {
 	args = {
 	}
 }
-
-function R:PopulateConfig()
-	R.Options.args.WSG.args.flagGroup.args.flagOffset.min = R.db.bgFrames.flag.flagOffsetMin
-	R.Options.args.WSG.args.flagGroup.args.flagOffset.max = R.db.bgFrames.flag.flagOffsetMax
-end

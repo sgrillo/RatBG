@@ -41,6 +41,12 @@ local function UpdateLabels(self)
 	end
 end
 
+local function BoundValue(self, value)
+	local min, max = (self.min() or 0), (self.max() or 100)
+	value = math_min(value, max)
+	self.value = math_max(value, min)
+end
+
 --[[-----------------------------------------------------------------------------
 Scripts
 -------------------------------------------------------------------------------]]
@@ -61,15 +67,16 @@ local function Slider_OnValueChanged(frame, newvalue)
 	local self = frame.obj
 	if not frame.setup then
 		if self.step and self.step > 0 then
-			local min_value =  self.min() or 0
+			local min_value = self.min() or 0
 			newvalue = floor((newvalue - min_value) / self.step + 0.5) * self.step + min_value
 		end
 		if newvalue ~= self.value and not self.disabled then
-			self.value = newvalue
-			self:Fire("OnValueChanged", newvalue)
+			BoundValue(self, newvalue)
+			self:Fire("OnValueChanged", self.value)
 		end
 		if self.value then
 			UpdateText(self)
+			UpdateLabels(self)
 		end
 	end
 end
@@ -85,11 +92,12 @@ local function Slider_OnMouseWheel(frame, v)
 	if not self.disabled then
 		local value = self.value
 		if v > 0 then
-			value = math_min(value + (self.step or 1), max)
+			value = value + (self.step or 1)
 		else
-			value = math_max(value - (self.step or 1), min)
+			value = value - (self.step or 1)
 		end
-		self.slider:SetValue(value)
+		BoundValue(self, value)
+		self.slider:SetValue(self.value)
 	end
 end
 
@@ -181,10 +189,10 @@ local methods = {
 	["SetValue"] = function(self, value)
 		self.slider.setup = true
 		self.slider:SetValue(value)
-		self.value = value
-		self:SetSliderValues(self.min(), self.max(), self.step)
-		self:UpdateText()
-		self:UpdateLabels()
+		BoundValue(self, value)
+		self:SetSliderValues((self.min or 0), (self.max or 0), (self.step or 1))
+		UpdateText(self)
+		UpdateLabels(self)
 		self.slider.setup = nil
 	end,
 
@@ -201,7 +209,7 @@ local methods = {
 		local frame = self.slider
 		frame.setup = true
 		self.step = step
-		frame:SetMinMaxValues(self.min() or 0,self.max() or 100)
+		frame:SetMinMaxValues(self.min() or 0, self.max() or 100)
 		frame:SetValueStep(step or 1)
 		if self.value then
 			frame:SetValue(self.value)
@@ -292,10 +300,13 @@ local function Constructor()
 		editbox     = editbox,
 		alignoffset = 25,
 		frame       = frame,
-		type        = Type
-		min			= SetMin(0)
-		max			= SetMax(100)
+		type        = Type,
+		SetMin		= SetMin,
+		SetMax		= SetMax
 	}
+
+	SetMin(widget, 0); SetMax(widget, 100)
+
 	for method, func in pairs(methods) do
 		widget[method] = func
 	end

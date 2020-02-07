@@ -38,9 +38,7 @@ function R:Initialize()
 	self.global = self.data.global
 	
 	self:LoadCommands()
-	self:PopulateConfig()
-	ACR:NotifyChange(self.AddonName)
-	self:HookElvUISkins()
+	self:HookElvUISkins()			--applies elvui theme to custom widgets for consistency sake
 	
 	if self.db.general.smoothingAmount and (self.db.general.smoothingAmount ~= 0.33) then
 		self:SetSmoothingAmount(self.db.general.smoothingAmount)
@@ -116,7 +114,6 @@ end
 function R:styleVarSliderBar(object, ...)
 	widget = R.hooks[ACG].Create(object, ...)
 	if widget and _G.ElvUI and _G.ElvUI[1].modules["Skins"] then
-		print("widget is good")
 		if widget.type == 'Slider-Variable' then
 			local frame = widget.slider
 			local editbox = widget.editbox
@@ -139,6 +136,5 @@ end
 
 function R:HookElvUISkins()
 	self:RawHook(ACG, "Create",  "styleVarSliderBar")
-	print("Hooked")
 	for k,v in pairs(R.hooks[ACG]) do print(k,v) end
 end
