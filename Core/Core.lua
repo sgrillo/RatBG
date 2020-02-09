@@ -94,20 +94,18 @@ do
 	getmetatable(_G.GameFontNormal).__index.BuildFont = BuildFont
 end
 
---Table Copy-- Credit to ElvUI
-function R:CopyTable(currentTable, defaultTable)
-	if type(currentTable) ~= "table" then currentTable = {} end
-	if type(defaultTable) == "table" then
-		for option, value in pairs(defaultTable) do
+--Table Copy--
+function R:CopyTable(to, from)
+	if type(to) ~= "table" then to = {} end
+	if type(from) == "table" then
+		for option, value in pairs(from) do
 			if type(value) == "table" then
-				value = self:CopyTable(currentTable[option], value)
+				value = self:CopyTable(to[option], value)
 			end
-
-			currentTable[option] = value
+			to[option] = value
 		end
 	end
-
-	return currentTable
+	return to
 end
 
 --Sneak variable slider widget into ElvUI for styling, it it's loaded--

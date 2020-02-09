@@ -6,7 +6,8 @@ T.general = {
 	AceGUI = {
 		width = 800,
 		height = 1000
-	}
+	},
+	maxFrames = 15
 }
 
 T.RatBlue = {
