@@ -1,4 +1,4 @@
-local R, DB = unpack(select(2, ...)); --Import: Engine, DB
+local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 -- Credit: ls- (lightspark)
 
 local abs, next, Lerp = abs, next, Lerp
@@ -124,8 +124,6 @@ local function DesmoothBar(bar)
 		frame:SetScript('OnUpdate', nil)
 	end
 end
-
-local _, rat = ...
 
 function R.SetSmoothingAmount(amount)
 	AMOUNT = clamp(amount, 0.2, 0.8)

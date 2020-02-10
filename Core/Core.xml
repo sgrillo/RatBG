@@ -1,5 +1,5 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
   <Script file="Core.lua"/>
-  <Script flie="Smoothie.lua"/>
+  <Script file="Smoothie.lua"/>
   <Script file="Config.lua"/>
 </Ui>

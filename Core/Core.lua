@@ -25,6 +25,8 @@ R.fontStrings = {}
 R.bgFrames = {}
 R.enemyData = {}
 
+local RBG = R.bgFrames
+
 ---Parent Frame---
 R.UIParent = CreateFrame("Frame", "RatBGParent", _G.UIParent)
 R.UIParent:SetSize(_G.UIParent:GetSize())
@@ -39,11 +41,14 @@ function R:Initialize()
 	
 	self:LoadCommands()
 	self:HookElvUISkins()			--applies elvui theme to custom widgets for consistency sake
+
+	RBG:OnInitialize()
+
 	
 end
 
 function R:Print(...)
-	_G.DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cFF", T.RatBlue.hex or "3291BA", "RatBG:|r ", ...)) 
+	_G.defaultPosition_CHAT_FRAME:AddMessage(strjoin("|cFF", T.RatBlue.hex or "3291BA", "RatBG:|r ", ...)) 
 end
 
 
@@ -94,6 +99,8 @@ end
 
 --Attach to font objects--
 do
+	local dummy = CreateFrame("Frame")
+	getmetatable(dummy:CreateFontString()).__index.BuildFont = BuildFont
 	getmetatable(_G.GameFontNormal).__index.BuildFont = BuildFont
 end
 
@@ -139,3 +146,56 @@ function R:HookElvUISkins()
 	self:RawHook(ACG, "Create",  "styleVarSliderBar")
 	for k,v in pairs(R.hooks[ACG]) do print(k,v) end
 end
+
+--Add mover to frame--
+function R:MakeDraggable(frame)
+	frame.defaultPosition = {}
+	local defaultPosition = frame.defaultPosition
+	defaultPosition.point, defaultPosition.relativeTo, defaultPosition.relativePoint, defaultPosition.xOfs, defaultPosition.yOfs = frame:GetPoint()
+	if defaultPosition.relativeTo and defaultPosition.relativeTo:GetName() then defaultPosition.relativeTo = defaultPosition.relativeTo:GetName() end
+
+	local moverFrame = CreateFrame("Frame",frame:GetName() and frame:GetName().."Mover" or nil, frame)
+	moverFrame:SetAllPoints()
+	moverFrame:SetFrameStrata("HIGH")
+	moverFrame:SetScript("OnDragStart", function(self) self:GetParent():StartMoving() end)
+	moverFrame:SetScript("OnDragStop", function(self) self:GetParent():StopMovingOrSizing() end)
+	moverFrame:Hide()
+	frame.moverFrame = moverFrame
+	frame:SetClampedToScreen(true)
+	frame:SetMovable(true)
+	frame:SetUserPlaced(true)
+
+	frame.unlock = function(self)
+		if not self:IsUserPlaced() then return end
+		self.moverFrame:Show()
+		self.moverFrame:EnableMouse(true)
+		self.moverFrame:RegisterForDrag("LeftButton")
+	end
+
+	frame.lock = function(self)
+		if not self:IsUserPlaced() then return end
+		self.moverFrame:Hide()
+		self.moverFrame:EnableMouse(false)
+		self.moverFrame:RegisterForDrag(nil)
+	end
+
+	frame.reset = function(self)
+		if self.defaultPosition then
+			self:ClearAllPoints()
+			local p = self.defaultPosition
+			if p.relativeTo and p.relativePoint then
+				self:SetPoint(p.point or "CENTER", p.relativeTo, p.relativePoint, p.xOfs or 0, p.yOfs or 0)
+			elseif p.relativeTo then
+				self:SetPoint(p.point or "CENTER", p.relativeTo, p.xOfs or 0, p.yOfs or 0)
+			else
+				self:SetPoint(p.point or "CENTER", p.xOfs or 0, p.yOfs or 0)
+			end
+		else
+			self:SetPoint("CENTER",0,0)
+		end
+	end
+end
+
+
+
+
