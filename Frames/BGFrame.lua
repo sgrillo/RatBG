@@ -70,6 +70,11 @@ function RBG:BuildFrame(name)
 
     frame:Hide()
 
+    --DEBUG--
+    --frame.debug = frame:CreateTexture(nil,"BACKGROUND")
+    --frame.debug:SetAllPoints()
+    --frame.debug:SetColorTexture(255,0,0,1)
+
     return frame
 end
 
@@ -77,7 +82,7 @@ function RBG:BuildGroup(header)
     local prevFrame
     for _,frame in ipairs(RBG.frames) do
         prevFrame = prevFrame or header
-        frame:SetPoint("TOPLEFT",prevFrame,"BOTTOMLEFT",0,RBG.db.barSpacing)
+        frame:SetPoint("TOPLEFT",prevFrame,"BOTTOMLEFT",0,-RBG.db.barSpacing + A.bgFrames.borderWidth / 2)  --if no spacing, overlap the borders
         prevFrame = frame
     end
 end
@@ -95,7 +100,7 @@ function RBG:ActivateFrame(frame)
     frame.active = true
 end
 
-function RBG:AddActiveFrame()
+function RBG:ActivateNextFrame()
     if RBG.activeFrames[RBG.frames[MAXFRAMES]] then return end -- frames added in order so we have no more space
     for i=1,#RBG.frames do
         if not RBG.activeFrames[RBG.frames[i]] then 
@@ -109,9 +114,11 @@ end
 
 function RBG:UpdateStatic(frame)
     print(frame:GetName())
+    frame:SetSize(RBG.db.frameWidth, RBG.db.frameHeight)
     for element in pairs(frame.elements) do
         print("Attempting to update element: "..element:GetName())
         element:staticUpdate(frame)
+        if RBG.activeFrames[frame] then element:Show() end
     end
 end
 
@@ -120,8 +127,7 @@ function RBG:UpdateAllStatic()
     self.UpdateBarTextures()
     for frame in pairs(self.activeFrames) do
         RBG:UpdateStatic(frame)
-        if self.activeFrames[frame] then frame:Show() 
-        else frame:Hide() end
+        frame:Show() 
     end
 end
 
@@ -152,13 +158,15 @@ function RBG:OnInitialize()
     self.HeaderFrame:Show()
 
     for i=1,MAXFRAMES do
-        self:BuildFrame("RatBGFrame"..i)
+        local frame = self:BuildFrame("RatBGFrame"..i)
+        frame.healthBar:Show()
+        frame:Show()
     end
 
+    self:BuildGroup(self.HeaderFrame)
     self:ActivateFrames(10)
     self:UpdateAllStatic()
-    self:BuildGroup(self.HeaderFrame)
-
+    
 end
 
 

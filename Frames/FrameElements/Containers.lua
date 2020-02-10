@@ -3,13 +3,12 @@ local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 local RBG = R.bgFrames
 
 function RBG:UpdateContainerStatic(frame)
-    print("Updating Container: "..frame:GetName())
     local width = 0
     local active = frame.active
     active = false
-    for element, staticUpdateFunction in pairs(frame.staticUpdates) do
-        staticUpdateFunction(frame)
-        width = width + element:IsActive() and (element:GetWidth() + 2)     --add 2 for the border
+    for element in pairs(self.elements) do
+        element:staticUpdate(frame)
+        width = width + (element:IsActive() and (element:GetWidth() + RBG.db.borderWidth * 2) or 0)     --add 2 for the border
         active = active or element:IsActive()
     end
     if active then
