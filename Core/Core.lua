@@ -10,6 +10,7 @@ local IsAddonLoaded = IsAddOnLoaded
 local LSM = R.Libs.LSM
 local ACR = R.Libs.AceConfigRegistry
 local ACG = R.Libs.AceGUI
+local AceEvent = LibStub("AceEvent-3.0")
 
 ---Constants---
 R.title = format("|cFF3291BA%s |r", "RatBG")
@@ -38,13 +39,15 @@ function R:Initialize()
 	self.data = R.Libs.AceDB:New("RatDB", self.DB)
 	self.db = self.data.profile
 	self.global = self.data.global
+
+	AceEvent:Embed(RBG)		--Enable events for the bg frames
 	
 	self:LoadCommands()
 	self:HookElvUISkins()			--applies elvui theme to custom widgets for consistency sake
 
-	RBG:OnInitialize()
+	self:EnableSmoothing()
 
-	
+	RBG:OnInitialize()
 end
 
 function R:Print(...)
@@ -54,6 +57,13 @@ end
 
 
 ---Utility Functions---
+
+--Enable Smoothing--
+function R:EnableSmoothing()
+	local meta = getmetatable(CreateFrame("StatusBar")).__index
+	if not meta.SetSmoothing then meta.SetSmoothing = R.SetSmoothing end
+end
+
 
 --dump a color as 3/4 outputs
 function rgb(color)
@@ -96,7 +106,7 @@ local function BuildFont(f, font, size, outline, color, shadow)
 	
 	if outline=="NONE" then
 		f:SetShadowColor(shadow.color)
-		f:SetShadowOffset(shadow.offset)
+		f:SetShadowOffset(shadow.Offset.x,shadow.Offset.y)
 	end
 
 	R.fontStrings[f] = true

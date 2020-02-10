@@ -17,8 +17,11 @@ RBG.statusbars = {}
 RBG.activeFrames = {}
 RBG.enemies = {}
 
+local ParentFrame = CreateFrame("Frame","RatBG Frames", UIParent)
+ParentFrame:SetMovable(true)
+ParentFrame:SetUserPlaced(true)
+
 function RBG:CreateHeader()
-    local ParentFrame = CreateFrame("Frame","RatBG Frames", UIParent)
     local c = A.bgFrames.bgColor
     ParentFrame.background = ParentFrame:CreateTexture(nil,"BACKGROUND")
     ParentFrame.background:SetColorTexture(c.r,c.g,c.b,c.a)
@@ -30,10 +33,16 @@ function RBG:CreateHeader()
     ParentFrame.title:BuildFont()
     ParentFrame:SetPoint("CENTER")
     R:MakeDraggable(ParentFrame)
+    R.fontStrings[ParentFrame.title] = true
     ParentFrame:unlock()
 
     return ParentFrame
 
+end
+
+function RBG:PLAYER_ENTERING_WORLD()
+    self:UpdateAllStatic()
+    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 function RBG:BuildFrame(name)
@@ -176,6 +185,8 @@ function RBG:OnInitialize()
     self:BuildGroup(self.HeaderFrame)
     self:ActivateFrames(10)
     self:UpdateAllStatic()
+
+    self:RegisterEvent("PLAYER_ENTERING_WORLD")
     
 end
 

@@ -31,6 +31,8 @@ function RBG:BuildHealthBar(frame)
     a,b = healthBar:GetMinMaxValues()
     print(a,b)
 
+    healthBar:SetSmoothing(true)
+
     self.statusbars[healthBar] = true
     frame.elements[healthBar] = true
 
@@ -47,8 +49,8 @@ end
 
 function RBG:UpdateHealthStatic(frame)
 
-    print("healthBar", self:GetName(), "parent", frame:GetName())
-    print("parent dimensions: ", frame:GetWidth(), ", ", frame:GetHeight())
+    --print("healthBar", self:GetName(), "parent", frame:GetName())
+    --print("parent dimensions: ", frame:GetWidth(), ", ", frame:GetHeight())
     rightBox, leftBox, border = frame.rightBox, frame.leftBox, A.bgFrames.borderWidth
     
     local bottomHeight = border + (RBG.db.trackPower ~= "None" and (border + RBG.powerBarHeight) or 0)
@@ -81,9 +83,6 @@ function RBG:UpdateHealthStatic(frame)
         self:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-border,bottomHeight)
     end
 
-    print(self:GetName(), " width: ", self:GetWidth(), ", height: ", self:GetHeight())
-
-    --R:SetSmoothing(frame.healthBar, true)
 end
 
 
