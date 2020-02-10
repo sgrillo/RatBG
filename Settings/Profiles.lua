@@ -11,7 +11,7 @@ A.bgFrames = {
 	frameWidth = 200,
 	frameHeight = 30,
 	barSpacing = 1,
-	borderWidth = 2,
+	borderWidth = 1,
 	fullName = true,
 	barColor = {
 		r = 0.32,
@@ -31,7 +31,7 @@ A.bgFrames = {
 		b = 0.06,
 		a = 1
 	},
-	barTexture = nil,
+	barTexture = "Blizzard",
 	classColorText = false,
 	classColorBars = false,
 	flag = {

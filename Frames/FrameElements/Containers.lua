@@ -2,30 +2,6 @@ local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
 local RBG = R.bgFrames
 
-function RBG:UpdateContainerStatic(frame)
-    local width = 0
-    local active = frame.active
-    active = false
-    for element in pairs(self.elements) do
-        element:staticUpdate(frame)
-        width = width + (element:IsActive() and (element:GetWidth() + RBG.db.borderWidth * 2) or 0)     --add 2 for the border
-        active = active or element:IsActive()
-    end
-    if active then
-        frame:SetWidth(width)
-        local parent = frame:GetParent()
-        if frame.side == "Left" then
-            frame:SetPoint("TOPLEFT",parent,"TOPLEFT")
-            frame:SetPoint("BOTTOMLEFT",parent,"BOTTOMLEFT")
-        else
-            frame:SetPoint("TOPRIGHT",parent,"TOPRIGHT")
-            frame:SetPoint("BOTTOMRIGHT",parent,"BOTTOMRIGHT")
-        end
-    else
-        frame:Hide()
-    end
-end
-
 local function buildContainer(frame, side)
     local container = CreateFrame("Frame",frame:GetName()..side.."Box",frame)
     container.elements = {}
@@ -37,12 +13,12 @@ local function buildContainer(frame, side)
     --register everything
     frame.elements[container] = true
 
-    RBG:RegisterUpdates(container, RBG.UpdateContainerStatic, RBG.UpdateContainerDynamic)
-
-    --frame.staticUpdates[container] = UpdateContainerStatic
-    --frame.dynamicUpdates[container] = RBG.UpdateContainerDynamic
+    container.staticUpdate = RBG.UpdateContainerStatic
+    container.dynamicUpdate = RBG.UpdateContainerDynamic
 
     container.IsActive = function() return container.active end
+
+    RBG:RegisterUpdates(container)
 
     return container
 end
@@ -52,6 +28,34 @@ function RBG:BuildContainers(frame)
     local rightBox = buildContainer(frame, "Right")
 
     return leftBox, rightBox
+end
+
+function RBG:UpdateContainerStatic(frame)
+    --print("Container Update: ", self:GetName(), ", ", frame:GetName())
+    local width = 0
+    local active = frame.active
+    self.active = false
+    for element in pairs(self.elements) do
+        --print("Attempting to update sub-element: "..element:GetName())
+        element:updateStatic(frame)
+        if element:IsActive() and frame:IsActive() then 
+            self:Show() 
+            element:Show()
+            width = width + element:GetWidth()
+            self.active = true            
+        end
+    end
+    if self.active then
+        self:SetWidth(width)
+
+        if self.side == "Left" then
+            self:SetPoint("TOPLEFT",frame,"TOPLEFT")
+            self:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT")
+        else
+            self:SetPoint("TOPRIGHT",frame,"TOPRIGHT")
+            self:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT")
+        end
+    end
 end
 
 function RBG:UpdateContainerDynamic(frame)

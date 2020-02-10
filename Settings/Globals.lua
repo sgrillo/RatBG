@@ -7,7 +7,24 @@ T.general = {
 		width = 800,
 		height = 1000
 	},
-	maxFrames = 15
+	maxFrames = 15,
+	powerColors = {
+		Mana = {
+			r = 0,
+			g = 0,
+			b = 255
+		},
+		Rage = {
+			r = 255,
+			g = 0,
+			b = 0
+		},
+		Energy = {
+			r = 255,
+			g = 255,
+			b = 0
+		}
+	}
 }
 
 T.RatBlue = {

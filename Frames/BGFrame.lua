@@ -47,10 +47,7 @@ function RBG:BuildFrame(name)
     frame.leftBox, frame.rightBox = RBG:BuildContainers(frame)
 
     frame.healthBar = RBG:BuildHealthBar(frame)
-
-    a,b = frame.healthBar:GetMinMaxValues()
-    print(a,b)
-    --frame.PowerBar = RBG:BuildPowerBar(frame)
+    frame.PowerBar = RBG:BuildPowerBar(frame)
     --frame.Name = RBG:BuildNameText(frame)
     --frame.leftBox.Rank = RBG:BuildRank(frame)
     --frame.leftBox.Class = RBG:BuildClassIcon(frame)
@@ -70,6 +67,8 @@ function RBG:BuildFrame(name)
 
     frame:Hide()
 
+    frame.IsActive = function() return RBG.activeFrames[frame] end
+
     --DEBUG--
     --frame.debug = frame:CreateTexture(nil,"BACKGROUND")
     --frame.debug:SetAllPoints()
@@ -82,7 +81,7 @@ function RBG:BuildGroup(header)
     local prevFrame
     for _,frame in ipairs(RBG.frames) do
         prevFrame = prevFrame or header
-        frame:SetPoint("TOPLEFT",prevFrame,"BOTTOMLEFT",0,-RBG.db.barSpacing + A.bgFrames.borderWidth / 2)  --if no spacing, overlap the borders
+        frame:SetPoint("TOPLEFT",prevFrame,"BOTTOMLEFT",0,-RBG.db.barSpacing)  --if no spacing, overlap the borders
         prevFrame = frame
     end
 end
@@ -113,28 +112,34 @@ end
 
 
 function RBG:UpdateStatic(frame)
-    print(frame:GetName())
+    --print(frame:GetName())
     frame:SetSize(RBG.db.frameWidth, RBG.db.frameHeight)
     for element in pairs(frame.elements) do
         print("Attempting to update element: "..element:GetName())
-        element:staticUpdate(frame)
-        if RBG.activeFrames[frame] then element:Show() end
+        element:updateStatic(frame)
+        if element:IsActive() and element:GetParent():IsActive() then 
+            element:Show() 
+            print(element:GetName()," displayed")
+        end
     end
 end
 
 function RBG:UpdateAllStatic()
-    self.powerBarHeight = self.db.frameHeight / 5
     self.UpdateBarTextures()
+    self.powerBarHeight = self.db.frameHeight / 5
     for frame in pairs(self.activeFrames) do
         RBG:UpdateStatic(frame)
         frame:Show() 
     end
+    
 end
 
 function RBG:UpdateBarTextures()
+    print("updating bars")
     for bar in pairs(RBG.statusbars) do
         if not bar:IsObjectType("StatusBar") then return end
-        bar:SetStatusBarTexture(LSM:Fetch("stausbar",RBG.db.barTexture))
+        print("updating bar: ", bar:GetName())
+        bar:SetStatusBarTexture(LSM:Fetch("statusbar", RBG.db.barTexture))
         if bar.background then
             local c = RBG.db.bgColor
             bar.background:SetColorTexture(c.r, c.g, c.b, c.a)
@@ -142,10 +147,15 @@ function RBG:UpdateBarTextures()
     end
 end
 
-function RBG:RegisterUpdates(object, staticUpdateFunc, dynamicUpdateFunc)
+------------------------------------
+--
+--      Set frame.staticUpdate = func to run an update in the static cycle 
+--      Set frame.dynamicUpdate = func to run an update in the dynamic cycle
+
+function RBG:RegisterUpdates(object)
     local updateMeta = getmetatable(object).__index
-    updateMeta.staticUpdate = staticUpdateFunc
-    updateMeta.dynamicUpdate = dynamicUpdateFunc
+    if not updateMeta.updateStatic then updateMeta.updateStatic = function(self, frame) if self.staticUpdate then self:staticUpdate(frame) end end end
+    if not updateMeta.updateDynamic then updateMeta.updateDynamic = function(self, frame) if self.dynamicUpdate then self:dynamicUpdate(frame) end end end
 end
 
 function RBG:OnInitialize()

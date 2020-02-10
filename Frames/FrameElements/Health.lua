@@ -22,10 +22,8 @@ function RBG:BuildHealthBar(frame)
     healthBar.background:SetAllPoints()
 
     --register with everything
-
-    --local updateMeta = getmetatable(healthbar).__index
-    --updateMeta.staticUpdate = RBG.UpdateHealthStatic
-    --updateMeta.dynamicUpdate = RBG.UpdateHealthDynamic
+    healthBar.staticUpdate = RBG.UpdateHealthStatic
+    healthBar.dynamicUpdate = RBG.UpdateHealthDynamic
 
     healthBar:SetMinMaxValues(0,1)
     healthBar:SetValue(1)
@@ -35,12 +33,10 @@ function RBG:BuildHealthBar(frame)
 
     self.statusbars[healthBar] = true
     frame.elements[healthBar] = true
-    --frame.staticUpdates[healthBar] = RBG.UpdateHealthStatic
-    --frame.dynamicUpdates[healthBar] = RBG.UpdateHealthDynamic
 
     healthBar.IsActive = function() return true end
 
-    RBG:RegisterUpdates(healthBar, RBG.UpdateHealthStatic, RBG.UpdateHealthDynamic)
+    RBG:RegisterUpdates(healthBar)
     
     return healthBar
 end
@@ -51,14 +47,15 @@ end
 
 function RBG:UpdateHealthStatic(frame)
 
-    print("healthBar", self:GetName(), "parent", frame)
+    print("healthBar", self:GetName(), "parent", frame:GetName())
+    print("parent dimensions: ", frame:GetWidth(), ", ", frame:GetHeight())
     rightBox, leftBox, border = frame.rightBox, frame.leftBox, A.bgFrames.borderWidth
-    local bottomHeight = border + (RBG.db.trackPower ~= "None" and RBG.powerBarHeight or 0)
+    
+    local bottomHeight = border + (RBG.db.trackPower ~= "None" and (border + RBG.powerBarHeight) or 0)
 
     local bdColor, bgColor, hpColor = RBG.db.bdColor, RBG.db.bgColor, RBG.db.barColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
     self.backdrop.tex:SetColorTexture(bdColor.r, bdColor.g, bdColor.b, bdColor.a)
-    self:SetStatusBarTexture(LSM:Fetch("statusbar", RBG.db.statusbar))
 
     if frame.enemy and frame.enemy.class and RBG.db.classColorBars then
         self:SetStatusBarColor(R:classColor(frame.enemy.class))

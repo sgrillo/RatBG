@@ -70,7 +70,9 @@ R.Options.args.BattlegroundBars = {
 					type = "select",
 					dialogControl = "LSM30_Statusbar",
 					name = "Bar Texture",
-					values = _G.AceGUIWidgetLSMlists.statusbar
+					values = _G.AceGUIWidgetLSMlists.statusbar,
+					get = function(info) return R.db.bgFrames[info[#info]] end,
+					set = function(info, value) R.db.bgFrames[info[#info]] = value; print(tostring(value)) end,
 				},
 				classColors = {
 					name = "Class Colors",

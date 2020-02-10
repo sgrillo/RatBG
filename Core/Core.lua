@@ -55,6 +55,11 @@ end
 
 ---Utility Functions---
 
+--dump a color as 3/4 outputs
+function rgb(color)
+	return color.r, color.g, color.b, color.a
+end
+
 --get class color RGB
 function R:classColor(class, rgb)
 	if type(class)~="string" then return end
