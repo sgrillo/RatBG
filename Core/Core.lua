@@ -20,7 +20,7 @@ R.myrealm = GetRealmName()
 ---Tables---
 R.media = {}
 R.frames = {}
-R.statusBars = {}
+R.statusbars = {}
 R.fontStrings = {}
 R.bgFrames = {}
 R.enemyData = {}
@@ -40,10 +40,6 @@ function R:Initialize()
 	self:LoadCommands()
 	self:HookElvUISkins()			--applies elvui theme to custom widgets for consistency sake
 	
-	if self.db.general.smoothingAmount and (self.db.general.smoothingAmount ~= 0.33) then
-		self:SetSmoothingAmount(self.db.general.smoothingAmount)
-	end
-	
 end
 
 function R:Print(...)
@@ -53,6 +49,13 @@ end
 
 
 ---Utility Functions---
+
+--get class color RGB
+function R:classColor(class, rgb)
+	if type(class)~="string" then return end
+	class = strupper(class)
+	return rgb and _G.RAID_CLASS_COLORS[class].getRGB or _G.RAID_CLASS_COLORS[class].colorStr
+end
 
 --Return rounded number
 function R:Round(num, idp)

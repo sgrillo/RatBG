@@ -8,4 +8,5 @@
   <Script file="Skull.lua"/>
   <Script file="TargetCount.lua"/>
   <Script file="Trinket.lua"/>
+  <Script file="Containers.lua"/>
 </Ui>

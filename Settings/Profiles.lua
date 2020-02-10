@@ -11,11 +11,24 @@ A.bgFrames = {
 	frameWidth = 200,
 	frameHeight = 30,
 	barSpacing = 1,
+	borderWidth = 1,
 	fullName = true,
 	barColor = {
 		r = 0.32,
 		g = 0.32,
 		b = 0.32,
+		a = 1
+	},
+	bdColor = {
+		r = 0.0,
+		g = 0.0,
+		b = 0.0,
+		a = 1
+	},
+	bgColor = {
+		r = 0.06,
+		g = 0.06,
+		b = 0.06,
 		a = 1
 	},
 	barTexture = nil,
@@ -31,7 +44,7 @@ A.bgFrames = {
 	icons = {
 		classIcon = true,
 		trinketIcon = false,
-		targetCount = false,
+		skullIcon = false,
 		rankIcon = false
 	},
 	trackHealth = true,
@@ -39,7 +52,8 @@ A.bgFrames = {
 	trackPower = "All",
 	freedomHighlight = true,
 	fapHighlight = true,
-	trackSkull = false
+	targetCount = false,
+	
 }
 
 A.font = {

@@ -68,9 +68,90 @@ R.Options.args.BattlegroundBars = {
 				barTexture = {
 					order = 4,
 					type = "select",
-					dialogControl = 'LSM30_Statusbar',
+					dialogControl = "LSM30_Statusbar",
 					name = "Bar Texture",
 					values = _G.AceGUIWidgetLSMlists.statusbar
+				},
+				classColors = {
+					name = "Class Colors",
+					type = "select",
+					order = 5,
+					desc = "Choose if bars or text is class-colored",
+					values = {
+						[0] = "Class-Colored Bars",
+						[1] = "Class-Colored Text",
+						[2] = "None"
+					},
+					set = function(info, value)
+						R.db.bgFrames.classColorBars = (value == 0)
+						R.db.bgFrames.classColorText = (value == 1)
+					end,
+					get = function(info)
+						local bar,text = R.db.bgFrames.classColorBars, R.db.bgFrames.classColorText
+						if bar == true and text == true then	---something weird happened, reset both
+							bar = false text = false
+						elseif bar == true then
+							return 0
+						elseif text == true then
+							return 1
+						end
+						return 2
+					end
+				},
+				smoothingAmount = {
+					name = "Smoothing Amount",
+					type = "range",
+					order = 6,
+					min=.20, max=.80, step = .01,
+					isPercent = true,
+					get = function(info) return R.db.general.smoothingAmount end,
+					set = function(info, value) R.db.general.smoothingAmount = value end
+				},
+				bdColor = {
+					name = "Border Color",
+					type = "color",
+					order = 8,
+					hasAlpha = true,
+					width = 0.7,
+					get = function(info)
+						local c = R.db.bgFrames[info[#info]]
+						return c.r, c.g, c.b, c.a
+					end,
+					set = function(info, r, g, b, a) 
+						local c = R.db.bgFrames[info[#info]]
+						c.r, c.g, c.b, c.a = r, g, b, a
+					end
+				},
+				barColor = {
+					name = "Health Color",
+					type = "color",
+					order = 7,
+					disabled = function() return R.db.bgFrames.classColorBars end,
+					hasAlpha = true,
+					width = 0.7,
+					get = function(info)
+						local c = R.db.bgFrames[info[#info]]
+						return c.r, c.g, c.b, c.a
+					end,
+					set = function(info, r, g, b, a) 
+						local c = R.db.bgFrames[info[#info]]
+						c.r, c.g, c.b, c.a = r, g, b, a
+					end
+				},
+				bgColor = {
+					name = "Background",
+					type = "color",
+					order = 9,
+					hasAlpha = true,
+					width = 0.72,
+					get = function(info)
+						local c = R.db.bgFrames[info[#info]]
+						return c.r, c.g, c.b, c.a
+					end,
+					set = function(info, r, g, b, a) 
+						local c = R.db.bgFrames[info[#info]]
+						c.r, c.g, c.b, c.a = r, g, b, a
+					end
 				},
 			}
 		},
@@ -102,61 +183,13 @@ R.Options.args.BattlegroundBars = {
 					name = "Outline Style",
 					values = textOutlines
 				},
-			}
-		},
-		colors = {
-			name = "Colors",
-			type = 'group',
-			inline = true,
-			order = 4,
-			args = {
-				classColors = {
-					name = "Class Colors",
-					type = "select",
-					order = 1,
-					desc = "Choose if bars or text is class-colored",
-					values = {
-						[0] = "Class-Colored Bars",
-						[1] = "Class-Colored Text",
-						[2] = "None"
-					},
-					set = function(info, value)
-						R.db.bgFrames.classColorBars = (value == 0)
-						R.db.bgFrames.classColorText = (value == 1)
-					end,
-					get = function(info)
-						local bar,text = R.db.bgFrames.classColorBars, R.db.bgFrames.classColorText
-						if bar == true and text == true then	---something weird happened, reset both
-							bar = false text = false
-						elseif bar == true then
-							return 0
-						elseif text == true then
-							return 1
-						end
-						return 2
-					end
-				},
-				barColor = {
-					name = "Bar Color",
-					type = 'color',
-					order = 5,
-					disabled = function() return R.db.bgFrames.classColorBars end,
-					hasAlpha = true,
-					get = function(info)
-						local c = R.db.bgFrames[info[#info]]
-						return c.r, c.g, c.b, c.a
-					end,
-					set = function(info, r, g, b, a) 
-						local c = R.db.bgFrames[info[#info]]
-						c.r, c.g, c.b, c.a = r, g, b, a
-					end
-				},
 				fontColor = {
-					name = "Font Color",
-					type = 'color',
-					order = 5,
+					name = "Color",
+					type = "color",
+					order = 4,
 					hasAlpha = true,
 					disabled = function() return R.db.bgFrames.classColorText end,
+					width = 0.5,
 					get = function(info)
 						local c = R.db.font.color
 						return c.r, c.g, c.b, c.a
@@ -167,10 +200,11 @@ R.Options.args.BattlegroundBars = {
 					end
 				},
 				shadowColor = {
-					name = "Shadow Color",
-					type = 'color',
-					order = 6,
+					name = "Shadow",
+					type = "color",
+					order = 9,
 					hasAlpha = true,
+					width = 0.6,
 					get = function(info)
 						local c = R.db.font.shadow.Color
 						return c.r, c.g, c.b, c.a
@@ -205,11 +239,11 @@ R.Options.args.BattlegroundBars = {
 					name = "Trinket Icon",
 					type = "toggle"
 				},
-				targetCount = {
+				skullIcon = {
 					order = 4,
-					name = "Target Count",
-					desc = "Shows how many members of your team are currently targetting the player",
-					type = "toggle"
+					type = "toggle",
+					name = "Skull Icon",
+					desc = "Shows when a player is affected by the Skull of Impending Doom and tracks the cooldown"
 				}
 			}
 		},
@@ -233,18 +267,18 @@ R.Options.args.BattlegroundBars = {
 					name = "Range Fade",
 					desc = "Fade the bar when the enemy is out of range.\nFade range is at least 30 yards for all classes"
 				},
+				targetCount = {
+					order = 3,
+					name = "Target Count",
+					desc = "Shows how many members of your team are currently targetting the player",
+					type = "toggle"
+				},
 				trackPower = {
 					order = 4,
 					type = "select",
 					name = "Power Bar",
 					desc = "Dynamically update power bars on the enemy. Can optionally choose to only show mana.",
 					values = { ["All"] = "All", ["Mana"] = "Mana Only", ["None"] = "None" }
-				},
-				trackSkull = {
-					order = 3,
-					type = "toggle",
-					name = "Track Skull",
-					desc = "Shows when a player is affected by the Skull of Impending Doom and tracks the cooldown"
 				},
 				freedomHighlight = {
 					order = 5,
@@ -303,7 +337,7 @@ R.Options.args.WSG = {
 	args = {
 		flagGroup = {
 			name = "Flag",
-			type = 'group',
+			type = "group",
 			order = 5,
 			inline = true,
 			get = function(info) return R.db.bgFrames.flag[info[#info]] end,
