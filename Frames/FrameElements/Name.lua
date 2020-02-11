@@ -6,7 +6,10 @@ local LSM = R.Libs.LSM
 function RBG:BuildNameText(frame)
     local healthBar = frame.healthBar
     local nameText = healthBar:CreateFontString(frame:GetName().."NameText","OVERLAY", "GameFontNormal")
+
+    
     nameText:BuildFont()
+    nameText:SetAllPoints()
 
     nameText.staticUpdate = RBG.UpdateNameStatic
     R.fontStrings[nameText] = true
@@ -25,10 +28,10 @@ function RBG:UpdateNameStatic(frame)
     --all font changes are handled by Core methods
 
 
-    self:ClearAllPoints()
+    --self:ClearAllPoints()
 
-    self:SetPoint("LEFT",healthBar,"LEFT",2,0)
-    self:SetPoint("RIGHT",healthBar,"RIGHT")
+    --self:SetPoint("BOTTOMLEFT",healthBar,"BOTTOMLEFT",2,0)
+    --self:SetPoint("TOPRIGHT",healthBar,"RIGHT")
 
     --Set Values
     if frame:hasEnemy() then

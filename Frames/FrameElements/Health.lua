@@ -6,17 +6,8 @@ local LSM = R.Libs.LSM
 function RBG:BuildHealthBar(frame)
     local healthBar = CreateFrame("StatusBar", frame:GetName().."HealthBar", frame)
     healthBar.background = healthBar:CreateTexture(nil, "BORDER")
-    healthBar.backdrop = CreateFrame("Frame", frame:GetName().."Border", healthBar)
 
     healthBar:SetFrameLevel(frame:GetFrameLevel()+5)                    -- make sure theres room to put stuff around this
-    
-    --setup border
-    local bW = A.bgFrames.borderWidth
-    healthBar.backdrop:SetPoint("TOPLEFT",healthBar,"TOPLEFT",-bW,bW)
-    healthBar.backdrop:SetPoint("BOTTOMRIGHT",healthBar,"BOTTOMRIGHT", bW, -bW)
-    healthBar.backdrop:SetFrameLevel(healthBar:GetFrameLevel()-2)
-    healthBar.backdrop.tex=healthBar.backdrop:CreateTexture(nil, "BORDER")
-    healthBar.backdrop.tex:SetAllPoints()
 
     --set statusbar background
     healthBar.background:SetAllPoints()
@@ -36,6 +27,8 @@ function RBG:BuildHealthBar(frame)
     healthBar.IsActive = function() return true end
 
     RBG:RegisterUpdates(healthBar)
+
+    healthBar:AddBorder()
     
     return healthBar
 end
@@ -50,11 +43,10 @@ function RBG:UpdateHealthStatic(frame)
     --print("parent dimensions: ", frame:GetWidth(), ", ", frame:GetHeight())
     rightBox, leftBox, border = frame.rightBox, frame.leftBox, A.bgFrames.borderWidth
     
-    local bottomHeight = border + (frame.powerBar:IsActive() and (border + RBG.powerBarHeight) or 0)
+    local bottomHeight = frame.powerBar:IsActive() and (RBG.powerBarHeight + R.pix) or 0
 
     local bdColor, bgColor, hpColor = RBG.db.bdColor, RBG.db.bgColor, RBG.db.barColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
-    self.backdrop.tex:SetColorTexture(bdColor.r, bdColor.g, bdColor.b, bdColor.a)
 
     if frame:hasEnemy() and frame.enemy.class and RBG.db.classColorBars then
         self:SetStatusBarColor(R:classColor(frame.enemy.class))
@@ -67,18 +59,20 @@ function RBG:UpdateHealthStatic(frame)
 
     if leftBox:IsActive() then
         print("left box anchor")
-        self:SetPoint("TOPLEFT",leftBox,"TOPRIGHT",border,-border)
+        self:SetPoint("TOPLEFT",leftBox,"TOPRIGHT")
     else
         print("left frame anchor")
-        self:SetPoint("TOPLEFT",frame,"TOPLEFT",border,-border)
+        self:SetPoint("TOPLEFT",frame,"TOPLEFT")
     end
     if rightBox:IsActive() then
         print("right box anchor")
-        self:SetPoint("BOTTOMRIGHT",rightBox,"BOTTOMLEFT",-border,bottomHeight)
+        self:SetPoint("BOTTOMRIGHT",rightBox,"BOTTOMLEFT",0,bottomHeight)
     else
         print("right frame anchor")
-        self:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",-border,bottomHeight)
+        self:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,bottomHeight)
     end
+
+    self:SetValue(math.random())
 
 end
 

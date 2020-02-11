@@ -4,19 +4,11 @@ local RBG = R.bgFrames
 local LSM = R.Libs.LSM
 
 function RBG:BuildPowerBar(frame)
-    local powerBar = CreateFrame("StatusBar", frame:GetName().."PowerBar", frame.healthBar)
+    local powerBar = CreateFrame("StatusBar", frame:GetName().."PowerBar", frame)
     powerBar.background = powerBar:CreateTexture(nil, "BORDER")
-    powerBar.backdrop = CreateFrame("Frame", frame:GetName().."Border", powerBar)
 
-    powerBar:SetFrameLevel(frame:GetFrameLevel()+10)                    -- make sure theres room to put stuff around this
+    powerBar:SetFrameLevel(frame:GetFrameLevel()+4)         --ordered below the healthbars for a more consistent look
     
-    --setup border
-    local bW = A.bgFrames.borderWidth
-    powerBar.backdrop:SetPoint("TOPLEFT",powerBar,"TOPLEFT",-bW,bW)
-    powerBar.backdrop:SetPoint("BOTTOMRIGHT",powerBar,"BOTTOMRIGHT", bW, -bW)
-    powerBar.backdrop:SetFrameLevel(powerBar:GetFrameLevel()-2)
-    powerBar.backdrop.tex=powerBar.backdrop:CreateTexture(nil, "BORDER")
-    powerBar.backdrop.tex:SetAllPoints()
 
     --set statusbar background
     powerBar.background:SetAllPoints()
@@ -39,6 +31,8 @@ function RBG:BuildPowerBar(frame)
     powerBar.IsActive = function() return powerBar.active end
 
     RBG:RegisterUpdates(powerBar)
+
+    powerBar:AddBorder()
     
     return powerBar
 end
@@ -51,7 +45,7 @@ local function LookupPowerType(frame)
     local powerTypes, class = T.general.powerTypes, frame.enemy.class
     --handle druids because they're silly
     if class == "Druid" then
-        return frame.enemy.powerType or "Mana"
+        return RBG.db.trackPower == "All" and frame.enemy.powerType or "Mana"
     end
     return powerTypes.Mana[class] and "Mana" or powerTypes.Energy[class] and "Energy" or powerTypes.Rage[class] and "Rage"
 end
@@ -59,48 +53,49 @@ end
 function RBG:UpdatePowerStatic(frame)
 
     --print("powerBar", self:GetName(), "parent", frame)
-    rightBox, leftBox, border = frame.rightBox, frame.leftBox, A.bgFrames.borderWidth
-    local bottomHeight = border + RBG.powerBarHeight      --Only matters if this is displayed
+    rightBox, leftBox = frame.rightBox, frame.leftBox
+    local bottomHeight = RBG.powerBarHeight      --Only matters if this is displayed
 
     local bdColor, bgColor = RBG.db.bdColor, RBG.db.bgColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
-    self.backdrop.tex:SetColorTexture(bdColor.r, bdColor.g, bdColor.b, bdColor.a)
 
     --Handle powerBar Display Settings
     local type = "Mana"
     if frame:hasEnemy() then
         type = LookupPowerType(frame) or type
+
     end
 
     if RBG.db.trackPower == "None" then
         self.active = false
-        frame.healthBar:updateStatic(frame)             --make sure to force update the health bar to ensure its sized correctly
-        return
+        self:Hide()
     elseif RBG.db.trackPower == "Mana" then
         if type ~= "Mana" then
             self.active = false
-            frame.healthBar:updateStatic(frame)
-            return
+            self:Hide()
         end
     else
-        self:SetStatusBarColor(rgb(T.general.powerColors[type]))
+        self.active = true
     end
+    self:SetStatusBarColor(rgb(T.general.powerColors[type]))
+    
+    frame.healthBar:updateStatic(frame)             --make sure to force update the health bar to ensure its sized correctly
 
     self:ClearAllPoints()
 
     if leftBox:IsActive() then
         --print("left box anchor")
-        self:SetPoint("BOTTOMLEFT",leftBox,"BOTTOMRIGHT",border,border)
+        self:SetPoint("BOTTOMLEFT",leftBox,"BOTTOMRIGHT")
     else
         --print("left frame anchor")
-        self:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",border,border)
+        self:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT")
     end
     if rightBox:IsActive() then
         --print("right box anchor")
-        self:SetPoint("TOPRIGHT",rightBox,"BOTTOMLEFT",-border,bottomHeight)
+        self:SetPoint("TOPRIGHT",rightBox,"BOTTOMLEFT",0,bottomHeight)
     else
         --print("right frame anchor")
-        self:SetPoint("TOPRIGHT",frame,"BOTTOMRIGHT",-border,bottomHeight)
+        self:SetPoint("TOPRIGHT",frame,"BOTTOMRIGHT",0,bottomHeight)
     end
 
     --print(self:GetName(), " width: ", self:GetWidth(), ", height: ", self:GetHeight())

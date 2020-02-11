@@ -1,7 +1,7 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
 ---Lua Functions---
-local _G, gsub, strjoin, twipe, tinsert, tremove, tContains, floor = _G, gsub, strjoin, wipe, tinsert, tremove, tContains, floor
+local _G, gsub, strjoin, twipe, tinsert, tremove, tContains, floor, sign = _G, gsub, strjoin, wipe, tinsert, tremove, tContains, floor, math.sign
 ---Wow API Functions---
 local AddMessage = AddMessage
 local CreateFrame = CreateFrame
@@ -25,12 +25,14 @@ R.statusbars = {}
 R.fontStrings = {}
 R.bgFrames = {}
 R.enemyData = {}
+R.pix = 1
 
 local RBG = R.bgFrames
 
 ---Parent Frame---
 R.UIParent = CreateFrame("Frame", "RatBGParent", _G.UIParent)
 R.UIParent:SetSize(_G.UIParent:GetSize())
+R.UIParent:SetPoint("CENTER")
 
 function R:Initialize()
 	
@@ -39,10 +41,14 @@ function R:Initialize()
 	self.data = R.Libs.AceDB:New("RatDB", self.DB)
 	self.db = self.data.profile
 	self.global = self.data.global
+	self.db.locations = self.db.locations or {}
 
 	AceEvent:Embed(RBG)		--Enable events for the bg frames
+
+	
 	
 	self:LoadCommands()
+	self:PixelScale()
 	self:HookElvUISkins()			--applies elvui theme to custom widgets for consistency sake
 
 	self:EnableSmoothing()
@@ -56,9 +62,25 @@ function R:UpdateAll()
 
 end
 
+--Chat Commands--
+
+function R:LoadCommands()
+	self:RegisterChatCommand("rbg", "TextInput")
+	self:RegisterChatCommand("ratbg", "TextInput")
+end
+
+function R:TextInput(msg)
+	local arg1 = self:GetArgs(msg)
+	self:ToggleOptionsUI(msg)
+end
+
 
 
 ---Utility Functions---
+
+function R:PixelScale()
+	R.pix = (768.0/string.match(({GetScreenResolutions()})[GetCurrentResolution()], "%d+x(%d+)"))/GetCVar("uiScale")
+end
 
 --Enable Smoothing--
 function R:EnableSmoothing()
@@ -86,13 +108,12 @@ function R:classColor(class, mult, str)
 end
 
 --Return rounded number
-function R:Round(num, idp)
-	if(idp and idp > 0) then
-		local mult = 10 ^ idp
-		return floor(num * mult + 0.5) / mult
-	end
-	return floor(num + 0.5)
+function R:Round(n, mult)
+	mult = mult or 1
+	return floor(n/mult + (n>=0 and 1 or -1) * 0.5) * mult
 end
+
+
 
 --Truncate a number off to n places
 function R:Truncate(v, decimals)
@@ -170,6 +191,23 @@ function R:HookElvUISkins()
 	for k,v in pairs(R.hooks[ACG]) do print(k,v) end
 end
 
+--Bump a frame so it aligns to the pixel grid
+local function BumpFrame(self)
+	self:StopMovingOrSizing()
+	local xOfs, yOfs = R.UIParent:GetLeft() - UIParent:GetLeft(), R.UIParent:GetTop() - UIParent:GetTop()
+	local xPos, yPos = self:GetLeft(), self:GetTop()
+	R:Print(xPos, yPos)
+	xPos = R:Round(xPos - xOfs, R.pix)
+	yPos = R:Round(yPos + yOfs, R.pix)
+	R:Print(xPos, yPos, xOfs, yOfs)
+
+	R.db.locations[self:GetName()] = {xPos, yPos}
+
+	self:ClearAllPoints()
+	self:SetPoint("TOPLEFT",R.UIParent,"BOTTOMLEFT", xPos, yPos)
+	
+end
+
 --Add mover to frame--
 function R:MakeDraggable(frame)
 	frame.defaultPosition = {}
@@ -180,23 +218,29 @@ function R:MakeDraggable(frame)
 	local moverFrame = CreateFrame("Frame",frame:GetName() and frame:GetName().."Mover" or nil, frame)
 	moverFrame:SetAllPoints()
 	moverFrame:SetFrameStrata("HIGH")
-	moverFrame:SetScript("OnDragStart", function(self) self:GetParent():StartMoving() end)
-	moverFrame:SetScript("OnDragStop", function(self) self:GetParent():StopMovingOrSizing() end)
+	moverFrame:SetScript("OnDragStart", function(self)
+		self:GetParent():ClearAllPoints() 
+		self:GetParent():StartMoving() 
+	end)
+	moverFrame:SetScript("OnDragStop", function(self)
+		--self:GetParent():StopMovingOrSizing()
+		BumpFrame(self:GetParent())
+		
+	end)
+
+
 	moverFrame:Hide()
 	frame.moverFrame = moverFrame
 	frame:SetClampedToScreen(true)
 	frame:SetMovable(true)
-	frame:SetUserPlaced(true)
 
 	frame.unlock = function(self)
-		if not self:IsUserPlaced() then return end
 		self.moverFrame:Show()
 		self.moverFrame:EnableMouse(true)
 		self.moverFrame:RegisterForDrag("LeftButton")
 	end
 
 	frame.lock = function(self)
-		if not self:IsUserPlaced() then return end
 		self.moverFrame:Hide()
 		self.moverFrame:EnableMouse(false)
 		self.moverFrame:RegisterForDrag(nil)

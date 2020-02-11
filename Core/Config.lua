@@ -66,7 +66,8 @@ R.Options.args.BattlegroundBars = {
 					name = "Bar Spacing",
 					desc = "Vertical spacing between bars",
 					min = 0, max = 10, step = 1,
-					get = function() return tonumber(R.db.bgFrames.barSpacing) end
+					get = function() return tonumber(R.db.bgFrames.barSpacing) end,
+					set = function(info,value) R.db.bgFrames[info[#info]] = value RBG:BuildGroup() end,
 				},
 				barTexture = {
 					order = 4,
@@ -75,7 +76,6 @@ R.Options.args.BattlegroundBars = {
 					name = "Bar Texture",
 					values = _G.AceGUIWidgetLSMlists.statusbar,
 					get = function(info) return R.db.bgFrames[info[#info]] end,
-					set = function(info, value) R.db.bgFrames[info[#info]] = value; RBG:UpdateAllStatic() end,
 				},
 				classColors = {
 					name = "Class Colors",
@@ -161,6 +161,13 @@ R.Options.args.BattlegroundBars = {
 						c.r, c.g, c.b, c.a = r, g, b, a
 						RBG:UpdateAllStatic()
 					end
+				},
+				borderWidth = {
+					order = 10,
+					type = "range",
+					name = "Border Width",
+					min = 0, max = 10, step = 1,
+					get = function() return tonumber(R.db.bgFrames.borderWidth) end
 				},
 			}
 		},

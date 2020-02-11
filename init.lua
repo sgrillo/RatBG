@@ -136,14 +136,6 @@ function Addon:ToggleOptionsUI(msg)
 	end
 end
 
-
---Chat Commands--
-
-function Addon:LoadCommands()
-	self:RegisterChatCommand("rbg", "ToggleOptionsUI")
-	self:RegisterChatCommand("ratbg", "ToggleOptionsUI")
-end
-
 --Config Loading---
 
 function Addon:ResetConfigSettings()
