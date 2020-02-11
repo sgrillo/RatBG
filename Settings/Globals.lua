@@ -10,27 +10,44 @@ T.general = {
 	maxFrames = 15,
 	powerColors = {
 		Mana = {
-			r = 0,
-			g = 0,
-			b = 255
+			r = .212,
+			g = .3098,
+			b = .4314
 		},
 		Rage = {
-			r = 255,
+			r = 1,
 			g = 0,
 			b = 0
 		},
 		Energy = {
-			r = 255,
-			g = 255,
+			r = 1,
+			g = 1,
 			b = 0
+		}
+	},
+	powerTypes = {
+		Mana = {
+			Mage = true,
+			Priest = true,
+			Warlock = true,
+			Hunter = true,
+			Shaman = true,
+			Paladin = true,
+			Druid = true,
+		},
+		Energy = {
+			Rogue = true
+		},
+		Rage = {
+			Warrior = true
 		}
 	}
 }
 
 T.RatBlue = {
-	r = 50,
-	g = 145,
-	b = 186,
-	hex = "3291BA",
-	displayText = "|cFF3291BA"
+	r = 104,
+	g = 31,
+	b = 128,
+	hex = "681f80",
+	displayText = "|cFF681f80"
 }

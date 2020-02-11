@@ -49,6 +49,7 @@ function RBG:BuildFrame(name)
     local frame = CreateFrame("Button", name, UIParent, "SecureActionButtonTemplate")
     tinsert(RBG.frames, frame)
 
+    frame.enemy = {}
     frame.elements = {}
     frame.staticUpdates = {}
     frame.dynamicUpdates = {}
@@ -56,8 +57,8 @@ function RBG:BuildFrame(name)
     frame.leftBox, frame.rightBox = RBG:BuildContainers(frame)
 
     frame.healthBar = RBG:BuildHealthBar(frame)
-    frame.PowerBar = RBG:BuildPowerBar(frame)
-    --frame.Name = RBG:BuildNameText(frame)
+    frame.powerBar = RBG:BuildPowerBar(frame)
+    frame.Name = RBG:BuildNameText(frame)
     --frame.leftBox.Rank = RBG:BuildRank(frame)
     --frame.leftBox.Class = RBG:BuildClassIcon(frame)
     --frame.rightBox.Trinket = RBG:BuildTrinketIcon(frame)
@@ -76,7 +77,9 @@ function RBG:BuildFrame(name)
 
     frame:Hide()
 
-    frame.IsActive = function() return RBG.activeFrames[frame] end
+    frame.IsActive = function() return frame.active end
+    frame.hasEnemy = function() return frame.enemy ~= nil end
+    frame.getEnemy = function() return frame.enemy end
 
     --DEBUG--
     --frame.debug = frame:CreateTexture(nil,"BACKGROUND")
@@ -95,11 +98,12 @@ function RBG:BuildGroup(header)
     end
 end
 
+---Activate Frames when in BG---
+
 function RBG:ActivateFrames(numEnemies)
     twipe(RBG.activeFrames)
     for i=1,min(numEnemies,MAXFRAMES) do
-        RBG.activeFrames[RBG.frames[i]]=true
-        RBG.frames[i].active = true
+        RBG:ActivateFrame(RBG.frames[i])
     end
 end
 
@@ -112,19 +116,23 @@ function RBG:ActivateNextFrame()
     if RBG.activeFrames[RBG.frames[MAXFRAMES]] then return end -- frames added in order so we have no more space
     for i=1,#RBG.frames do
         if not RBG.activeFrames[RBG.frames[i]] then 
-            activeFrames[RBG.frames[i]] = true 
-            RBG.frames[i].active = true
+            RBG:ActivateFrame(RBG.frames[i])
             return 
         end
     end
 end
 
+---Updates---
+
+function RBG:UpdateAll()
+    self.UpdateAllStatic()
+    --self.UpdateAllDynamic()
+end
 
 function RBG:UpdateStatic(frame)
     --print(frame:GetName())
     frame:SetSize(RBG.db.frameWidth, RBG.db.frameHeight)
     for element in pairs(frame.elements) do
-        print("Attempting to update element: "..element:GetName())
         element:updateStatic(frame)
         if element:IsActive() and element:GetParent():IsActive() then 
             element:Show() 
@@ -140,14 +148,11 @@ function RBG:UpdateAllStatic()
         RBG:UpdateStatic(frame)
         frame:Show() 
     end
-    
 end
 
 function RBG:UpdateBarTextures()
-    print("updating bars")
     for bar in pairs(RBG.statusbars) do
         if not bar:IsObjectType("StatusBar") then return end
-        print("updating bar: ", bar:GetName())
         bar:SetStatusBarTexture(LSM:Fetch("statusbar", RBG.db.barTexture))
         if bar.background then
             local c = RBG.db.bgColor
@@ -184,6 +189,14 @@ function RBG:OnInitialize()
 
     self:BuildGroup(self.HeaderFrame)
     self:ActivateFrames(10)
+
+
+    ---DEBUG fill frames with dummy data---
+    for frame in pairs(self.activeFrames) do
+        local enemy = RBG:GenerateEnemy()
+        frame.enemy = enemy
+    end
+
     self:UpdateAllStatic()
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD")

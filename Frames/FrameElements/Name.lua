@@ -5,7 +5,7 @@ local LSM = R.Libs.LSM
 
 function RBG:BuildNameText(frame)
     local healthBar = frame.healthBar
-    local nameText = healthBar:CreateFontString(nil,"ARTWORK", "GameFontNormal")
+    local nameText = healthBar:CreateFontString(frame:GetName().."NameText","OVERLAY", "GameFontNormal")
     nameText:BuildFont()
 
     nameText.staticUpdate = RBG.UpdateNameStatic
@@ -13,31 +13,30 @@ function RBG:BuildNameText(frame)
 
     nameText.IsActive = function() return true end
 
+    frame.elements[nameText] = true
     RBG:RegisterUpdates(nameText)
 
     return nameText
 end
 
 function RBG:UpdateNameStatic(frame)
-    rightBox, leftBox = frame.rightBox, frame.leftBox
+    healthBar = frame.healthBar
 
     --all font changes are handled by Core methods
 
+
     self:ClearAllPoints()
 
-    if leftBox:IsActive() then
-        self:SetPoint("TOPLEFT",leftBox,"TOPRIGHT",border + 2,0)
-    else
-        self:SetPoint("TOPLEFT",frame,"TOPLEFT",border + 2,0)
-    end
-    if rightBox:IsActive() then
-        self:SetPoint("BOTTOMRIGHT",rightBox,"BOTTOMLEFT",0,0)
-    else
-        self:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,0)
-    end
+    self:SetPoint("LEFT",healthBar,"LEFT",2,0)
+    self:SetPoint("RIGHT",healthBar,"RIGHT")
 
     --Set Values
     if frame:hasEnemy() then
-        self:SetText(RBG.db.fullName and frame.enemy.fullName or frame.enemy.name)
+        self:SetText(RBG.db.fullName and frame.enemy.fullname or frame.enemy.name)
+        if RBG.db.classColorText then
+            self:SetTextColor(R:classColor(frame.enemy.class))
+        else
+            self:SetTextColor(rgb(R.db.font.color))
+        end
     end
 end

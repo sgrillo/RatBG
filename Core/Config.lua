@@ -6,6 +6,8 @@ tsort = table.sort
 R.Libs.AceConfig:RegisterOptionsTable(R.AddonName, R.Options)
 R.Libs.AceConfigDialog:SetDefaultSize(R.AddonName, R:GetConfigDefaultSize())
 
+local RBG = R.bgFrames
+
 
 R.Options.childGroups = "tab"
 
@@ -36,7 +38,7 @@ R.Options.args.BattlegroundBars = {
 			name = "Bar Appearance",
 			inline = true,
 			get = function(info) return R.db.bgFrames[info[#info]] end,
-			set = function(info,value) R.db.bgFrames[info[#info]] = value end,
+			set = function(info,value) R.db.bgFrames[info[#info]] = value RBG:UpdateAllStatic() end,
 			args = {
 				frameWidth = {
 					order = 0,
@@ -47,6 +49,7 @@ R.Options.args.BattlegroundBars = {
 					get = function() return tonumber(R.db.bgFrames.frameWidth) end,
 					set = function(info,value) 
 						R.db.bgFrames[info[#info]] = value
+						RBG:UpdateAllStatic()
 					end
 				},
 				frameHeight = {
@@ -72,7 +75,7 @@ R.Options.args.BattlegroundBars = {
 					name = "Bar Texture",
 					values = _G.AceGUIWidgetLSMlists.statusbar,
 					get = function(info) return R.db.bgFrames[info[#info]] end,
-					set = function(info, value) R.db.bgFrames[info[#info]] = value; print(tostring(value)) end,
+					set = function(info, value) R.db.bgFrames[info[#info]] = value; RBG:UpdateAllStatic() end,
 				},
 				classColors = {
 					name = "Class Colors",
@@ -87,6 +90,7 @@ R.Options.args.BattlegroundBars = {
 					set = function(info, value)
 						R.db.bgFrames.classColorBars = (value == 0)
 						R.db.bgFrames.classColorText = (value == 1)
+						RBG:UpdateAllStatic()
 					end,
 					get = function(info)
 						local bar,text = R.db.bgFrames.classColorBars, R.db.bgFrames.classColorText
@@ -107,7 +111,7 @@ R.Options.args.BattlegroundBars = {
 					min=.20, max=.80, step = .01,
 					isPercent = true,
 					get = function(info) return R.db.general.smoothingAmount end,
-					set = function(info, value) R.db.general.smoothingAmount = value end
+					set = function(info, value) R.db.general.smoothingAmount = value R.SetSmoothingAmount(value) end
 				},
 				bdColor = {
 					name = "Border Color",
@@ -122,6 +126,7 @@ R.Options.args.BattlegroundBars = {
 					set = function(info, r, g, b, a) 
 						local c = R.db.bgFrames[info[#info]]
 						c.r, c.g, c.b, c.a = r, g, b, a
+						RBG:UpdateAllStatic()
 					end
 				},
 				barColor = {
@@ -138,6 +143,7 @@ R.Options.args.BattlegroundBars = {
 					set = function(info, r, g, b, a) 
 						local c = R.db.bgFrames[info[#info]]
 						c.r, c.g, c.b, c.a = r, g, b, a
+						RBG:UpdateAllStatic()
 					end
 				},
 				bgColor = {
@@ -153,6 +159,7 @@ R.Options.args.BattlegroundBars = {
 					set = function(info, r, g, b, a) 
 						local c = R.db.bgFrames[info[#info]]
 						c.r, c.g, c.b, c.a = r, g, b, a
+						RBG:UpdateAllStatic()
 					end
 				},
 			}
@@ -163,7 +170,7 @@ R.Options.args.BattlegroundBars = {
 			name = "Font",
 			inline = true,
 			get = function(info) return R.db.font[info[#info]] end,
-			set = function(info, value) R.db.font[info[#info]] = value end,
+			set = function(info, value) R.db.font[info[#info]] = value RBG:UpdateAllStatic() end,
 			args = {
 				font = {
 					order = 1,
@@ -199,6 +206,7 @@ R.Options.args.BattlegroundBars = {
 					set = function(info, r, g, b, a) 
 						local c = R.db.font.color
 						c.r, c.g, c.b, c.a = r, g, b, a
+						RBG:UpdateAllStatic()
 					end
 				},
 				shadowColor = {
@@ -214,6 +222,7 @@ R.Options.args.BattlegroundBars = {
 					set = function(info, r, g, b, a) 
 						local c = R.db.font.shadow.Color
 						c.r, c.g, c.b, c.a = r, g, b, a
+						RBG:UpdateAllStatic()
 					end
 				}
 			}
@@ -224,7 +233,7 @@ R.Options.args.BattlegroundBars = {
 			order = 6,
 			inline = true,
 			get = function(info) return R.db.bgFrames.icons[info[#info]] end,
-			set = function(info, value) R.db.bgFrames.icons[info[#info]] = value end,
+			set = function(info, value) R.db.bgFrames.icons[info[#info]] = value RBG:UpdateAllStatic() end,
 			args = {
 				classIcon = {
 					order = 2,
@@ -255,7 +264,7 @@ R.Options.args.BattlegroundBars = {
 			order = 7,
 			inline = true,
 			get = function(info) return R.db.bgFrames[info[#info]] end,
-			set = function(info, value) R.db.bgFrames[info[#info]] = value end,
+			set = function(info, value) R.db.bgFrames[info[#info]] = value RBG:UpdateAllStatic() end,
 			args = {
 				trackHealth = {
 					order = 1,
@@ -270,7 +279,7 @@ R.Options.args.BattlegroundBars = {
 					desc = "Fade the bar when the enemy is out of range.\nFade range is at least 30 yards for all classes"
 				},
 				targetCount = {
-					order = 3,
+					order = 9,
 					name = "Target Count",
 					desc = "Shows how many members of your team are currently targetting the player",
 					type = "toggle"
@@ -310,7 +319,13 @@ R.Options.args.BattlegroundBars = {
 					desc = "Alert sound to play when detecting stealthed enemy player",
 					values = _G.AceGUIWidgetLSMlists.sound,
 					disabled = function() return not R.db.general.stealthAlert end
-				}
+				},
+				fullName = {
+					order = 3,
+					type = "toggle",
+					name = "Realm",
+					desc = "Lists the player's Realm name with their name"
+				},
 			}
 		}
 	}

@@ -50,8 +50,10 @@ function R:Initialize()
 	RBG:OnInitialize()
 end
 
-function R:Print(...)
-	_G.defaultPosition_CHAT_FRAME:AddMessage(strjoin("|cFF", T.RatBlue.hex or "3291BA", "RatBG:|r ", ...)) 
+function R:UpdateAll()
+	print("updating!")
+	RBG:UpdateAll()
+
 end
 
 
@@ -66,15 +68,21 @@ end
 
 
 --dump a color as 3/4 outputs
-function rgb(color)
-	return color.r, color.g, color.b, color.a
+function rgb(c)
+	return c.r, c.g, c.b, c.a or 1
 end
 
 --get class color RGB
-function R:classColor(class, rgb)
+function R:classColor(class, mult, str)
 	if type(class)~="string" then return end
 	class = strupper(class)
-	return rgb and _G.RAID_CLASS_COLORS[class].getRGB or _G.RAID_CLASS_COLORS[class].colorStr
+	if str then
+		return _G.RAID_CLASS_COLORS[class].colorStr
+	else
+		if not mult then mult = 1 end
+		local r,g,b = _G.RAID_CLASS_COLORS[class]:GetRGB()
+		return r*mult, g*mult, b*mult
+	end
 end
 
 --Return rounded number

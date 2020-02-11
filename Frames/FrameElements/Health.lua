@@ -28,9 +28,6 @@ function RBG:BuildHealthBar(frame)
     healthBar:SetMinMaxValues(0,1)
     healthBar:SetValue(1)
 
-    a,b = healthBar:GetMinMaxValues()
-    print(a,b)
-
     healthBar:SetSmoothing(true)
 
     self.statusbars[healthBar] = true
@@ -53,13 +50,13 @@ function RBG:UpdateHealthStatic(frame)
     --print("parent dimensions: ", frame:GetWidth(), ", ", frame:GetHeight())
     rightBox, leftBox, border = frame.rightBox, frame.leftBox, A.bgFrames.borderWidth
     
-    local bottomHeight = border + (RBG.db.trackPower ~= "None" and (border + RBG.powerBarHeight) or 0)
+    local bottomHeight = border + (frame.powerBar:IsActive() and (border + RBG.powerBarHeight) or 0)
 
     local bdColor, bgColor, hpColor = RBG.db.bdColor, RBG.db.bgColor, RBG.db.barColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
     self.backdrop.tex:SetColorTexture(bdColor.r, bdColor.g, bdColor.b, bdColor.a)
 
-    if frame.enemy and frame.enemy.class and RBG.db.classColorBars then
+    if frame:hasEnemy() and frame.enemy.class and RBG.db.classColorBars then
         self:SetStatusBarColor(R:classColor(frame.enemy.class))
     else
         local c = RBG.db.barColor
