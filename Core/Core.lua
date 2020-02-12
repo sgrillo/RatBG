@@ -98,6 +98,9 @@ end
 function R:classColor(class, mult, str)
 	if type(class)~="string" then return end
 	class = strupper(class)
+	--[[ if class == "SHAMAN" then					TURNS OUT I DONT NEED THIS
+		return 1,1,1
+	end ]]
 	if str then
 		return _G.RAID_CLASS_COLORS[class].colorStr
 	else

@@ -105,6 +105,12 @@ function RBG:BuildFrame(name)
     return frame
 end
 
+function RBG:AssignEnemies()
+    --all enemies are assigned simultaneously, since adding a new one requires resorting anyways
+    
+
+end
+
 function RBG:BuildGroup(header)
     local header = header or RBG.HeaderFrame
     local prevFrame

@@ -51,3 +51,16 @@ T.RatBlue = {
 	hex = "681f80",
 	displayText = "|cFF681f80"
 }
+
+--Table is kind of "backwards" to look up values quick
+T.SortOrder = {
+	Mage = 5,
+	Priest = 1,
+	Warlock = 6,
+	Hunter = 7,
+	Shaman = 3,
+	Paladin = 2,
+	Druid = 4,
+	Rogue = 9,
+	Warrior = 8
+}
