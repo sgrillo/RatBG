@@ -41,12 +41,13 @@ function RBG:UpdateHealthStatic(frame)
 
     --print("healthBar", self:GetName(), "parent", frame:GetName())
     --print("parent dimensions: ", frame:GetWidth(), ", ", frame:GetHeight())
-    rightBox, leftBox, border = frame.rightBox, frame.leftBox, A.bgFrames.borderWidth
+    rightBox, leftBox, border = frame.rightBox, frame.leftBox, RBG.db.borderWidth
     
-    local bottomHeight = frame.powerBar:IsActive() and (RBG.powerBarHeight + R.pix) or 0
+    local bottomHeight = frame.powerBar:IsActive() and ((RBG.powerBarHeight + border) * R.pix) or 0
 
     local bdColor, bgColor, hpColor = RBG.db.bdColor, RBG.db.bgColor, RBG.db.barColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
+    
 
     if frame:hasEnemy() and frame.enemy.class and RBG.db.classColorBars then
         self:SetStatusBarColor(R:classColor(frame.enemy.class))

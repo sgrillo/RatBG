@@ -107,6 +107,8 @@ end
 
 function RBG:AssignEnemies()
     --all enemies are assigned simultaneously, since adding a new one requires resorting anyways
+
+    --todo change this to require config
     
 
 end
@@ -154,7 +156,7 @@ end
 
 function RBG:UpdateStatic(frame)
     --print(frame:GetName())
-    frame:SetSize(RBG.db.frameWidth, RBG.db.frameHeight)
+    frame:SetSize(RBG.db.frameWidth*pix, RBG.db.frameHeight*pix)
     for element in pairs(frame.elements) do
         element:updateStatic(frame)
         if element:IsActive() and element:GetParent():IsActive() then 
@@ -167,7 +169,7 @@ end
 function RBG:UpdateAllStatic()
     self.UpdateBarTextures()
     self:UpdateBorders()
-    self.powerBarHeight = R:Round(self.db.frameHeight / 5)*pix
+    self.powerBarHeight = R:Round(self.db.frameHeight / 5)
     for frame in pairs(self.activeFrames) do
         RBG:UpdateStatic(frame)
         frame:Show() 
@@ -246,7 +248,7 @@ end
 function RBG:OnInitialize()
     self.db = R.db.bgFrames
     self.statusbars = R.statusbars
-    self.powerBarHeight = R:Round(self.db.frameHeight / 5)*pix
+    self.powerBarHeight = R:Round(self.db.frameHeight / 5)
 
     self.HeaderFrame = RBG:CreateHeader()
     self.HeaderFrame:Show()
