@@ -98,6 +98,7 @@ function RBG:UpdatePowerStatic(frame)
         self:SetPoint("TOPRIGHT",frame,"BOTTOMRIGHT",0,bottomHeight)
     end
 
+    --self:SetValue(math.random())
     --print(self:GetName(), " width: ", self:GetWidth(), ", height: ", self:GetHeight())
 
 end

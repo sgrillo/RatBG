@@ -59,21 +59,21 @@ function RBG:UpdateHealthStatic(frame)
     self:ClearAllPoints()
 
     if leftBox:IsActive() then
-        print("left box anchor")
+        --print("left box anchor")
         self:SetPoint("TOPLEFT",leftBox,"TOPRIGHT")
     else
-        print("left frame anchor")
+        --print("left frame anchor")
         self:SetPoint("TOPLEFT",frame,"TOPLEFT")
     end
     if rightBox:IsActive() then
-        print("right box anchor")
+        --print("right box anchor")
         self:SetPoint("BOTTOMRIGHT",rightBox,"BOTTOMLEFT",0,bottomHeight)
     else
-        print("right frame anchor")
+        --print("right frame anchor")
         self:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,bottomHeight)
     end
 
-    self:SetValue(math.random())
+    --self:SetValue(math.random())
 
 end
 

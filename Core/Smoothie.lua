@@ -130,7 +130,6 @@ function R.SetSmoothingAmount(amount)
 end
 
 function R.SetSmoothing(bar, enable)
-	print("smoothie test: "..bar:GetName())
 	if enable then
 		SmoothBar(bar)
 	else

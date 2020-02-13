@@ -15,6 +15,7 @@ local AceEvent = LibStub("AceEvent-3.0")
 ---Constants---
 R.title = format("|cFF3291BA%s |r", "RatBG")
 R.myfaction, R.myLocalizedFaction = UnitFactionGroup("player")
+R.myFactionID = R.myfaction == "Alliance" and 1 or 0
 R.myname = UnitName("player")
 R.myrealm = GetRealmName()
 
@@ -23,11 +24,13 @@ R.media = {}
 R.frames = {}
 R.statusbars = {}
 R.fontStrings = {}
-R.bgFrames = {}
 R.enemyData = {}
 R.pix = 1
 
-local RBG = R.bgFrames
+R.bgFrames = {}
+R.scanner = {}
+
+local RBG, Scanner = R.bgFrames, R.scanner
 
 ---Parent Frame---
 R.UIParent = CreateFrame("Frame", "RatBGParent", _G.UIParent)
@@ -44,7 +47,7 @@ function R:Initialize()
 	self.db.locations = self.db.locations or {}
 
 	AceEvent:Embed(RBG)		--Enable events for the bg frames
-
+	AceEvent:Embed(Scanner)	--And in the target scanner
 	
 	
 	self:LoadCommands()
@@ -54,6 +57,7 @@ function R:Initialize()
 	self:EnableSmoothing()
 
 	RBG:OnInitialize()
+	Scanner:OnInitialize()
 end
 
 function R:UpdateAll()
@@ -71,7 +75,11 @@ end
 
 function R:TextInput(msg)
 	local arg1 = self:GetArgs(msg)
-	self:ToggleOptionsUI(msg)
+	if arg1 == "hide" or arg1 == "Hide" then
+		RBG:Hide()
+	else
+		self:ToggleOptionsUI(msg)
+	end
 end
 
 

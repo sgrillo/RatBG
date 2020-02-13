@@ -4,7 +4,7 @@ local RBG = R.bgFrames
 local LSM = R.Libs.LSM
 
 --Lua functions
-local _G, tinsert, min, twipe= _G, tinsert, math.min, wipe
+local _G, tinsert, twipe, tsort, min, format = _G, tinsert, wipe, table.sort, math.min, string.format
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local GetInstanceInfo = GetInstanceInfo
@@ -17,9 +17,15 @@ RBG.frames = {}
 RBG.statusbars = {}
 RBG.borders = {}
 RBG.activeFrames = {}
-RBG.enemies = {}
+RBG.enemies = {}                -- Ordered table for sorting
+RBG.testenemies = {}
+RBG.Unassigned = {}
+RBG.frameNames = {}
+RBG.pendingUpdate = {}
 
 
+
+------Create Frames-------
 
 function RBG:CreateHeader()
     local ParentFrame = CreateFrame("Frame","RatBG Frames", R.UIParent)
@@ -41,15 +47,8 @@ function RBG:CreateHeader()
     R.fontStrings[ParentFrame.title] = true
     ParentFrame:unlock()
 
-    
-
     return ParentFrame
 
-end
-
-function RBG:PLAYER_ENTERING_WORLD()
-    self:UpdateAllStatic()
-    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 function RBG:BuildFrame(name)
@@ -105,14 +104,6 @@ function RBG:BuildFrame(name)
     return frame
 end
 
-function RBG:AssignEnemies()
-    --all enemies are assigned simultaneously, since adding a new one requires resorting anyways
-
-    --todo change this to require config
-    
-
-end
-
 function RBG:BuildGroup(header)
     local header = header or RBG.HeaderFrame
     local prevFrame
@@ -123,7 +114,68 @@ function RBG:BuildGroup(header)
     end
 end
 
----Activate Frames when in BG---
+function RBG:Hide()                         -- todo stop updates
+    RBG.HeaderFrame:Hide()
+    for i=1,#RBG.frames do
+        RBG.frames[i]:Hide()
+    end
+end
+
+function RBG:Show()                         -- todo stop updates
+    RBG:AssignEnemies()
+end
+
+----Enemy Assignment-----
+
+function RBG:AddEnemy(enemy)
+    tinsert(RBG.enemies, enemy)
+    RBG.frameNames[enemy.fullname] = enemy
+end
+
+--Temp sort order--
+local sortOrder = {"class","name","rank"}
+
+local function Compare(a, b, level)
+    local level = level or 1
+    if a[sortOrder[level]] == b[sortOrder[level]] and level < #sortOrder then
+        return Compare(a, b, level+1)
+    elseif sortOrder[level]=="class" then
+        return T.SortOrder[a.class] < T.SortOrder[b.class]
+    elseif sortOrder[level]=="rank" then
+        return a.rank >= b.rank
+    else
+        return a[sortOrder[level]] <= b[sortOrder[level]]
+    end
+end
+
+local function GenerateTestInfo()
+    for i=1,10 do
+        local enemy = RBG:GenerateEnemy()
+        tinsert(RBG.testenemies,enemy)
+    end
+end
+
+
+function RBG:AssignEnemies(test)
+
+    local table = (test and "test" or "") .. "enemies"
+
+    --all enemies are assigned simultaneously, since adding a new one requires resorting anyways
+    sort(RBG[table], Compare)
+    sort(RBG[table], Compare)
+    sort(RBG[table], Compare)
+
+    for i=1,#RBG.enemies do
+        local e, f = RBG[table][i], RBG.frames[i]
+        f.enemy = e
+        f:SetAttribute("macrotext1", "/targetexact "..e.fullname)
+    end
+
+    RBG:ActivateFrames(#RBG[table])
+    RBG:UpdateAll()
+
+end
+
 
 function RBG:ActivateFrames(numEnemies)
     twipe(RBG.activeFrames)
@@ -147,7 +199,12 @@ function RBG:ActivateNextFrame()
     end
 end
 
----Updates---
+--------Updates--------
+
+function RBG:PLAYER_ENTERING_WORLD()
+    self:UpdateAllStatic()
+    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+end
 
 function RBG:UpdateAll()
     self.UpdateAllStatic()
@@ -161,16 +218,16 @@ function RBG:UpdateStatic(frame)
         element:updateStatic(frame)
         if element:IsActive() and element:GetParent():IsActive() then 
             element:Show() 
-            print(element:GetName()," displayed")
+            --print(element:GetName()," displayed")
         end
     end
 end
 
 function RBG:UpdateAllStatic()
-    self.UpdateBarTextures()
-    self:UpdateBorders()
-    self.powerBarHeight = R:Round(self.db.frameHeight / 5)
-    for frame in pairs(self.activeFrames) do
+    RBG.UpdateBarTextures()
+    RBG:UpdateBorders()
+    RBG.powerBarHeight = R:Round(RBG.db.frameHeight / 5)
+    for frame in pairs(RBG.activeFrames) do
         RBG:UpdateStatic(frame)
         frame:Show() 
     end
@@ -260,14 +317,10 @@ function RBG:OnInitialize()
     end
 
     self:BuildGroup(self.HeaderFrame)
-    self:ActivateFrames(10)
 
 
     ---DEBUG fill frames with dummy data---
-    for frame in pairs(self.activeFrames) do
-        local enemy = RBG:GenerateEnemy()
-        frame.enemy = enemy
-    end
+    self:AssignEnemies()
 
     self:UpdateAllStatic()
 

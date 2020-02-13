@@ -62,5 +62,5 @@ T.SortOrder = {
 	Paladin = 2,
 	Druid = 4,
 	Rogue = 9,
-	Warrior = 8
+	Warrior = 0
 }
