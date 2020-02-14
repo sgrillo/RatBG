@@ -19,7 +19,7 @@ function Scanner:CheckZone()
         Scanner.zone = zone 
         Scanner:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
         scanner:SetScript("OnUpdate", Scanner.search)
-        --Scanner:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+        Scanner:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
     else
         RBG:Clear()
         Scanner:UnregisterEvent("UPDATE_BATTLEFIELD_SCORE")
@@ -51,7 +51,16 @@ function Scanner:search()
     end
     Scanner:scanTree("target",seen)
     Scanner:scanTree("mouseover",seen)
+    Scanner:updateUnits(seen) 
+end
 
+function Scanner:UPDATE_MOUSEOVER_UNIT()
+    local seen = {}
+    Scanner:scanTree("mouseover",seen)
+    Scanner:updateUnits(seen)
+end
+
+function Scanner:updateUnits(seen)
     for name,id in pairs(seen) do
         local frame = RBG.frameNames[name]
         if frame then
@@ -86,10 +95,6 @@ function Scanner:scanTree(unitID, seen)
     Scanner:scanTree(unitID.."target", seen)
 end
 
-
-    
-    
-
 --check the scoreboard for enemies 
 function Scanner:UPDATE_BATTLEFIELD_SCORE()
     if InCombatLockdown() then
@@ -110,22 +115,24 @@ function Scanner:UPDATE_BATTLEFIELD_SCORE()
     
     for i=1,GetNumBattlefieldScores() do
         local pname, _, _, _, _, pfaction, prank, _, pclass = GetBattlefieldScore(i)
-        if pfaction ~= R.myFactionID then
-            exists[pname] = nil
-            if not RBG.frameNames[pname] then           --not tracking this player
-                found = true
-                local enemy = {
-                    name = strmatch(pname,"(.-)%-(.*)$") or pname,
-                    fullname = pname,
-                    class = pclass,
-                    maxHealth = 100,
-                    currentHealth = 100,
-                    maxPower = 100,
-                    currentPower = 100,
-                    powerType = "Mana",
-                    rank = prank
-                }
-                RBG:AddEnemy(enemy)
+        if pname then                                        --handle those stupid broken names
+            if pfaction ~= R.myFactionID then
+                if exists[pname] then exists[pname] = nil end
+                if not RBG.frameNames[pname] then           --not tracking this player
+                    found = true
+                    local enemy = {
+                        name = strmatch(pname,"(.-)%-(.*)$") or pname,
+                        fullname = pname,
+                        class = pclass,
+                        maxHealth = 100,
+                        currentHealth = 100,
+                        maxPower = 100,
+                        currentPower = 100,
+                        powerType = "Mana",
+                        rank = prank
+                    }
+                    RBG:AddEnemy(enemy)
+                end
             end
         end
     end

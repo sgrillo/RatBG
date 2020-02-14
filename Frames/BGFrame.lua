@@ -127,7 +127,7 @@ function RBG:AddEnemy(enemy)
 end
 
 function RBG:Evict(enemy)
-    for i,e in RBG.enemies do
+    for i,e in pairs(RBG.enemies) do
         if e == enemy then
             tremove(RBG.enemies, i)
             RBG.frameNames[enemy.fullname] = nil

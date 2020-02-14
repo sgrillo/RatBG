@@ -53,8 +53,9 @@ function RBG:UpdatePowerDynamic(frame)
     if not frame.enemy then return end
     local power, maxPower = frame.enemy.currentPower, frame.enemy.maxPower
     if frame.enemy.class == "Druid" then     --need to check if we need to change bar color
-        if RBG.db.trackPower == "All" then 
-            self:SetStatusBarColor(rgb(T.general.powerColors[frame.enemy.powerType]))
+        if RBG.db.trackPower == "All" then
+            local type = frame.enemy.powerType or "Mana"
+            self:SetStatusBarColor(rgb(T.general.powerColors[type]))
         elseif RBG.db.trackPower == "Mana" then
             power, maxPower = frame.enemy.currentMana, frame.enemy.maxMana
         end
