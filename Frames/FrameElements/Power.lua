@@ -1,5 +1,7 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
+local strupper = strupper
+
 local RBG = R.bgFrames
 local LSM = R.Libs.LSM
 
@@ -55,7 +57,7 @@ function RBG:UpdatePowerDynamic(frame)
     if frame.enemy.class == "Druid" then     --need to check if we need to change bar color
         if RBG.db.trackPower == "All" then
             local type = frame.enemy.powerType or "Mana"
-            self:SetStatusBarColor(rgb(T.general.powerColors[type]))
+            self:SetStatusBarColor(rgb(T.general.powerColors[strupper(type)]))
         elseif RBG.db.trackPower == "Mana" then
             power, maxPower = frame.enemy.currentMana, frame.enemy.maxMana
         end
@@ -94,7 +96,7 @@ function RBG:UpdatePowerStatic(frame)
     else
         self.active = true
     end
-    self:SetStatusBarColor(rgb(T.general.powerColors[type]))
+    self:SetStatusBarColor(rgb(T.general.powerColors[strupper(type)]))
     
     frame.healthBar:updateStatic(frame)             --make sure to force update the health bar to ensure its sized correctly
 

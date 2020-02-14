@@ -9,17 +9,17 @@ T.general = {
 	},
 	maxFrames = 15,
 	powerColors = {
-		Mana = {
+		MANA = {
 			r = 79.0/255,
 			g = 115.0/255,
 			b = 161.0/255
 		},
-		Rage = {
+		RAGE = {
 			r = 199.0/255,
 			g = 64.0/255,
 			b = 64.0/255
 		},
-		Energy = {
+		ENERGY = {
 			r = 166.0/255,
 			g = 161.0/255,
 			b = 89.0/255

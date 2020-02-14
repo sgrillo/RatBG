@@ -9,4 +9,5 @@
   <Script file="TargetCount.lua"/>
   <Script file="Trinket.lua"/>
   <Script file="Containers.lua"/>
+  <Script file="Flag.lua"/>
 </Ui>

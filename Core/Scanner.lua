@@ -128,8 +128,11 @@ function Scanner:UPDATE_BATTLEFIELD_SCORE()
                         currentHealth = 100,
                         maxPower = 100,
                         currentPower = 100,
+                        maxMana = 100,
+                        currentMana = 100,
                         powerType = "Mana",
-                        rank = prank
+                        rank = prank,
+                        flag = false
                     }
                     RBG:AddEnemy(enemy)
                 end
