@@ -3,7 +3,11 @@ local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 local format = string.format
 
 T.Media = {
-    rankIcons = {}
+    rankIcons = {},
+    flagIcons = {
+        Alliance = "Interface\\WorldStateFrame\\AllianceFlag",
+        Horde = "Interface\\WorldStateFrame\\HordeFlag"
+    }
 }
 
 do
