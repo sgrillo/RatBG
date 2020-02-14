@@ -82,3 +82,7 @@ A.font = {
 		}
 	}
 }
+
+A.scanner = {
+	updateFreq = 0.3
+}

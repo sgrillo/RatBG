@@ -37,18 +37,32 @@ function RBG:BuildPowerBar(frame)
     return powerBar
 end
 
-function RBG:UpdatePowerDynamic(frame)
-
-end
-
 local function LookupPowerType(frame)
-    local powerTypes, class = T.general.powerTypes, frame.enemy.class
-    --handle druids because they're silly
-    if class == "Druid" then
-        return RBG.db.trackPower == "All" and frame.enemy.powerType or "Mana"
+    if frame.enemy and frame.enemy.class then
+        local powerTypes, class = T.general.powerTypes, frame.enemy.class
+        --handle druids because they're silly
+        if class == "Druid" then
+            return RBG.db.trackPower == "All" and frame.enemy.powerType or "Mana"
+        end
+        return powerTypes.Mana[class] and "Mana" or powerTypes.Energy[class] and "Energy" or powerTypes.Rage[class] and "Rage"
     end
-    return powerTypes.Mana[class] and "Mana" or powerTypes.Energy[class] and "Energy" or powerTypes.Rage[class] and "Rage"
+    return nil
 end
+
+function RBG:UpdatePowerDynamic(frame)
+    if not frame.enemy then return end
+    local power, maxPower = frame.enemy.currentPower, frame.enemy.maxPower
+    if frame.enemy.class == "Druid" then     --need to check if we need to change bar color
+        if RBG.db.trackPower == "All" then 
+            self:SetStatusBarColor(rgb(T.general.powerColors[frame.enemy.powerType]))
+        elseif RBG.db.trackPower == "Mana" then
+            power, maxPower = frame.enemy.currentMana, frame.enemy.maxMana
+        end
+    end
+    self:SetValue(power / maxPower)
+end
+
+
 
 function RBG:UpdatePowerStatic(frame)
 
@@ -62,7 +76,7 @@ function RBG:UpdatePowerStatic(frame)
 
     --Handle powerBar Display Settings
     local type = "Mana"
-    if frame:hasEnemy() then
+    if frame.enemy then
         type = LookupPowerType(frame) or type
     end
 
@@ -73,6 +87,8 @@ function RBG:UpdatePowerStatic(frame)
         if type ~= "Mana" then
             self.active = false
             self:Hide()
+        else
+            self.active = true
         end
     else
         self.active = true

@@ -4,7 +4,7 @@ local RBG = R.bgFrames
 local LSM = R.Libs.LSM
 
 --Lua functions
-local _G, tinsert, twipe, tsort, min, format = _G, tinsert, wipe, table.sort, math.min, string.format
+local _G, tinsert, twipe, tsort, tremove, min, format = _G, tinsert, wipe, table.sort, table.remove, math.min, string.format
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local GetInstanceInfo = GetInstanceInfo
@@ -18,10 +18,10 @@ RBG.statusbars = {}
 RBG.borders = {}
 RBG.activeFrames = {}
 RBG.enemies = {}                -- Ordered table for sorting
-RBG.testenemies = {}
-RBG.Unassigned = {}
 RBG.frameNames = {}
 RBG.pendingUpdate = {}
+RBG.testenemies = {}
+
 
 
 
@@ -84,13 +84,6 @@ function RBG:BuildFrame(name)
     frame:Hide()
 
     frame.IsActive = function() return frame.active end
-    frame.hasEnemy = function() return frame.enemy ~= nil end
-    frame.getEnemy = function() return frame.enemy end
-
-    --DEBUG--
-    --frame.debug = frame:CreateTexture(nil,"BACKGROUND")
-    --frame.debug:SetAllPoints()
-    --frame.debug:SetColorTexture(255,0,0,1)
 
     RBG:RegisterUpdates(frame)
 
@@ -99,7 +92,8 @@ function RBG:BuildFrame(name)
     frame.hoverLayer:SetFrameLevel(frame:GetFrameLevel()+100)                       --make sure this is on top
 
     frame.hoverLayer:AddBorder()
-    --frame.hoverLayer:UpdateBorder(_, 3, {r=0,g=0,b=0,a=1})             --
+
+    frame:SetScript("OnUpdate", function() RBG:UpdateDynamic(frame) end)
 
     return frame
 end
@@ -127,9 +121,19 @@ end
 
 ----Enemy Assignment-----
 
+--No need to assign in these, handled by the scanner
 function RBG:AddEnemy(enemy)
     tinsert(RBG.enemies, enemy)
-    RBG.frameNames[enemy.fullname] = enemy
+end
+
+function RBG:Evict(enemy)
+    for i,e in RBG.enemies do
+        if e == enemy then
+            tremove(RBG.enemies, i)
+            RBG.frameNames[enemy.fullname] = nil
+            return
+        end
+    end
 end
 
 --Temp sort order--
@@ -169,12 +173,25 @@ function RBG:AssignEnemies(test)
         local e, f = RBG[table][i], RBG.frames[i]
         f.enemy = e
         f:SetAttribute("macrotext1", "/targetexact "..e.fullname)
+        RBG.frameNames[e.fullname] = f
     end
 
     RBG:ActivateFrames(#RBG[table])
     RBG:UpdateAll()
 
 end
+
+function RBG:Clear()
+    RBG.activeFrames = {}
+    RBG.enemies = {}
+    RBG.frameNames = {}
+    RBG.pendingUpdate = {}
+    for _,frame in pairs(RBG.frames) do
+        frame.enemy = nil
+        frame:Hide()
+    end
+end
+
 
 
 function RBG:ActivateFrames(numEnemies)
@@ -233,6 +250,21 @@ function RBG:UpdateAllStatic()
     end
 end
 
+function RBG:UpdateDynamic(frame)
+    if RBG.pendingUpdate[frame] then
+        for element in pairs(frame.elements) do
+            if element:IsActive() then element:updateDynamic(frame) end
+        end
+        RBG.pendingUpdate[frame] = nil
+    end
+end
+
+function RBG:UpdateAllDynamic()
+    for frame in pairs(RBG.activeFrames) do
+        RBG:UpdateDynamic(frame)
+    end
+end
+
 function RBG:UpdateBarTextures()
     for bar in pairs(RBG.statusbars) do
         if not bar:IsObjectType("StatusBar") then return end
@@ -243,6 +275,8 @@ function RBG:UpdateBarTextures()
         end
     end
 end
+
+
 
 ------------------------------------
 --

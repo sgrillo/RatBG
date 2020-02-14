@@ -34,7 +34,7 @@ function RBG:UpdateNameStatic(frame)
     --self:SetPoint("TOPRIGHT",healthBar,"RIGHT")
 
     --Set Values
-    if frame:hasEnemy() then
+    if frame.enemy then
         self:SetText(RBG.db.fullName and frame.enemy.fullname or frame.enemy.name)
         if RBG.db.classColorText then
             self:SetTextColor(R:classColor(frame.enemy.class))

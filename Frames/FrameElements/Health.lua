@@ -34,7 +34,11 @@ function RBG:BuildHealthBar(frame)
 end
 
 function RBG:UpdateHealthDynamic(frame)
-
+    if frame.enemy and frame.enemy.maxHealth and frame.enemy.currentHealth then
+        self:SetValue(frame.enemy.currentHealth / frame.enemy.maxHealth)
+    else
+        self:SetValue(1)
+    end
 end
 
 function RBG:UpdateHealthStatic(frame)
@@ -49,7 +53,7 @@ function RBG:UpdateHealthStatic(frame)
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
     
 
-    if frame:hasEnemy() and frame.enemy.class and RBG.db.classColorBars then
+    if frame.enemy and frame.enemy.class and RBG.db.classColorBars then
         self:SetStatusBarColor(R:classColor(frame.enemy.class))
     else
         local c = RBG.db.barColor
@@ -73,7 +77,11 @@ function RBG:UpdateHealthStatic(frame)
         self:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,bottomHeight)
     end
 
-    --self:SetValue(math.random())
+    if frame.enemy and frame.enemy.currentHealth and frame.enemy.maxHealth then
+        self:SetValue(frame.enemy.currentHealth / frame.enemy.maxHealth)
+    else
+        self:SetValue(1)
+    end
 
 end
 

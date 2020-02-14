@@ -37,8 +37,10 @@ function RBG:GenerateEnemy()
         currentHealth = rand(0,100),
         maxPower = 100,
         currentPower = rand(0,100),
+        maxMana = 100,
+        currentMana = rand(0,100),
         powerType = powerTypes[rand(1,3)],
         rank = rand(0,14)
-    }
+    }                                               --currentMana only used as a backup for druids that are in form with Mana Only selected
     return enemy
 end
