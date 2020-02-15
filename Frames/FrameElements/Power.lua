@@ -1,6 +1,6 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
-local strupper = strupper
+local strupper, rand = strupper, math.random
 
 local RBG = R.bgFrames
 local LSM = R.Libs.LSM
@@ -52,6 +52,7 @@ local function LookupPowerType(frame)
 end
 
 function RBG:UpdatePowerDynamic(frame)
+    if RBG.testMode then return end
     if not frame.enemy then self:SetValue(1) return end
     local power, maxPower = frame.enemy.currentPower, frame.enemy.maxPower
     if frame.enemy.class == "Druid" then     --need to check if we need to change bar color
@@ -71,7 +72,7 @@ function RBG:UpdatePowerStatic(frame)
 
     --print("powerBar", self:GetName(), "parent", frame)
     rightBox, leftBox = frame.rightBox, frame.leftBox
-    local bottomHeight = RBG.powerBarHeight * R.pix       --Only matters if this is displayed
+    local bottomHeight = R:Round(RBG.powerBarHeight, R.pix)       --Only matters if this is displayed
 
     local bdColor, bgColor = RBG.db.bdColor, RBG.db.bgColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
@@ -95,8 +96,8 @@ function RBG:UpdatePowerStatic(frame)
     
 
     --Handle powerBar Display Settings
-    local type = "Mana"
-    if frame.enemy then
+    local type, enemy = "Mana", RBG.testMode and frame.testenemy or frame.enemy
+    if enemy then
         type = LookupPowerType(frame) or type
     end
 
@@ -117,7 +118,8 @@ function RBG:UpdatePowerStatic(frame)
     
     frame.healthBar:updateStatic(frame)             --make sure to force update the health bar to ensure its sized correctly
 
-    if frame.enemy and frame.enemy.currentPower and frame.enemy.maxPower then
+    if RBG.testMode then self:SetValue(rand())
+    elseif frame.enemy and frame.enemy.currentPower and frame.enemy.maxPower then
         self:SetValue(frame.enemy.currentPower / frame.enemy.maxPower)
     else
         self:SetValue(1)

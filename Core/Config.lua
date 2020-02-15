@@ -366,7 +366,7 @@ R.Options.args.WSG = {
 			order = 5,
 			inline = true,
 			get = function(info) return R.db.bgFrames.flag[info[#info]] end,
-			set = function(info, value) R.db.bgFrames.flag[info[#info]] = value end,
+			set = function(info, value) R.db.bgFrames.flag[info[#info]] = value RBG:UpdateAllStatic() end,
 			args = {
 				trackFlag = {
 					order = 1,

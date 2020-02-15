@@ -21,7 +21,7 @@ RBG.frameNames = {}
 RBG.pendingUpdate = {}
 RBG.testenemies = {}
 
-
+RBG.testMode = false
 
 
 ------Create Frames-------
@@ -32,7 +32,7 @@ function RBG:CreateHeader()
     ParentFrame.background = ParentFrame:CreateTexture(nil,"BACKGROUND")
     ParentFrame.background:SetColorTexture(c.r,c.g,c.b,c.a)
     ParentFrame.background:SetAllPoints()
-    ParentFrame:SetSize(self.db.frameWidth*R.pix, self.db.frameHeight*R.pix)
+    ParentFrame:SetSize(R:Round(self.db.frameWidth,R.pix), R:Round(self.db.frameHeight,R.pix))
     ParentFrame.title = ParentFrame:CreateFontString(nil,"ARTWORK", "GameFontNormal")
     ParentFrame.title:SetAllPoints()
     ParentFrame.title:SetText(T.RatBlue.displayText.."RatBG Frames")
@@ -103,8 +103,17 @@ function RBG:BuildGroup(header)
     local prevFrame
     for _,frame in ipairs(RBG.frames) do
         prevFrame = prevFrame or header
-        frame:SetPoint("TOPLEFT",prevFrame,"BOTTOMLEFT",0,-RBG.db.barSpacing*R.pix)  --if no spacing, overlap the borders
+        frame:SetPoint("TOPLEFT",prevFrame,"BOTTOMLEFT",0,R:Round(-RBG.db.barSpacing,R.pix))  --if no spacing, overlap the borders
         prevFrame = frame
+    end
+end
+
+local function GenerateTestInfo(num)
+    local num = num or 10
+    twipe(RBG.testenemies)
+    for i=1,num do
+        local enemy = RBG:GenerateEnemy()
+        tinsert(RBG.testenemies,enemy)
     end
 end
 
@@ -126,6 +135,16 @@ end
 function RBG:Unlock()
     RBG.HeaderFrame:unlock()
 end
+
+function RBG:TestToggle(num)
+    RBG.testMode = (not RBG.testMode)
+    if RBG.testMode then 
+        GenerateTestInfo(num)
+        RBG:AssignEnemies(num)
+    end
+    RBG:UpdateAll()
+end 
+    
 
 ----Enemy Assignment-----
 
@@ -160,31 +179,23 @@ local function Compare(a, b, level)
     end
 end
 
-local function GenerateTestInfo()
-    for i=1,10 do
-        local enemy = RBG:GenerateEnemy()
-        tinsert(RBG.testenemies,enemy)
-    end
-end
+function RBG:AssignEnemies(num)
 
-
-function RBG:AssignEnemies(test)
-
-    local table = (test and "test" or "") .. "enemies"
-
+    local table = (RBG.testMode and "test" or "") .. "enemies"
+    local field = (RBG.testMode and "test" or "") .. "enemy"
     --all enemies are assigned simultaneously, since adding a new one requires resorting anyways
     sort(RBG[table], Compare)
     sort(RBG[table], Compare)
     sort(RBG[table], Compare)
 
-    for i=1,#RBG.enemies do
+    for i=1,#RBG[table] do
         local e, f = RBG[table][i], RBG.frames[i]
-        f.enemy = e
+        f[field] = e
         f:SetAttribute("macrotext1", "/targetexact "..e.fullname)
         RBG.frameNames[e.fullname] = f
     end
 
-    RBG:ActivateFrames(#RBG[table])
+    RBG:ActivateFrames(num or #RBG[table])
     RBG:UpdateAll()
 
 end
@@ -204,8 +215,9 @@ end
 
 function RBG:ActivateFrames(numEnemies)
     twipe(RBG.activeFrames)
-    for i=1,min(numEnemies,MAXFRAMES) do
-        RBG:ActivateFrame(RBG.frames[i])
+    for i=1,MAXFRAMES do
+        if i<=numEnemies then RBG:ActivateFrame(RBG.frames[i])
+        else RBG.frames[i]:Hide() end
     end
 end
 
@@ -238,7 +250,7 @@ end
 
 function RBG:UpdateStatic(frame)
     --print(frame:GetName())
-    frame:SetSize(RBG.db.frameWidth*R.pix, RBG.db.frameHeight*R.pix)
+    frame:SetSize(R:Round(RBG.db.frameWidth,R.pix), R:Round(RBG.db.frameHeight,R.pix))
     R:Print(frame:GetWidth(), frame:GetHeight(), R.pix)
     for element in pairs(frame.elements) do
         element:updateStatic(frame)
@@ -250,9 +262,10 @@ function RBG:UpdateStatic(frame)
 end
 
 function RBG:UpdateAllStatic()
+    RBG.HeaderFrame:SetSize(R:Round(RBG.db.frameWidth,R.pix), R:Round(RBG.db.frameHeight,R.pix))
     RBG.UpdateBarTextures()
     RBG:UpdateBorders()
-    RBG.powerBarHeight = R:Round(RBG.db.frameHeight / 5)
+    RBG.powerBarHeight = R:Round(RBG.db.frameHeight / 5, R.pix)
     for frame in pairs(RBG.activeFrames) do
         RBG:UpdateStatic(frame)
         frame:Show() 
@@ -305,26 +318,42 @@ function RBG:AddBorder()
     --create border frames
     local borderFrames = {}
     
-    borderFrames.t = CreateFrame("Frame",nil,frame) 
-    borderFrames.t:SetPoint("BOTTOMLEFT",frame,"TOPLEFT") borderFrames.t:SetPoint("BOTTOMRIGHT",frame,"TOPRIGHT")
-    borderFrames.r = CreateFrame("Frame",nil,frame) 
-    borderFrames.r:SetPoint("TOPLEFT",frame,"TOPRIGHT") borderFrames.r:SetPoint("BOTTOMLEFT",frame,"BOTTOMRIGHT")
-    borderFrames.b = CreateFrame("Frame",nil,frame) 
+    borderFrames.t = CreateFrame("Frame","DONG1",frame)
+    borderFrames.r = CreateFrame("Frame","DONG2",frame)
+    borderFrames.b = CreateFrame("Frame","DONG3",frame)  
+    borderFrames.l = CreateFrame("Frame","DONG4",frame) 
+    borderFrames.tl = CreateFrame("Frame","DONG5",frame) 
+    borderFrames.tr = CreateFrame("Frame","DONG6",frame) 
+    borderFrames.bl = CreateFrame("Frame","DONG7",frame) 
+    borderFrames.br = CreateFrame("Frame","DONG8",frame) 
+    --[[borderFrames.t:SetPoint("BOTTOMLEFT",frame,"TOPLEFT") borderFrames.t:SetPoint("BOTTOMRIGHT",frame,"TOPRIGHT")
+    borderFrames.r:SetPoint("TOPLEFT",frame,"TOPRIGHT") borderFrames.r:SetPoint("BOTTOMLEFT",frame,"BOTTOMRIGHT") 
     borderFrames.b:SetPoint("TOPLEFT",frame,"BOTTOMLEFT") borderFrames.b:SetPoint("TOPRIGHT",frame,"BOTTOMRIGHT")
-    borderFrames.l = CreateFrame("Frame",nil,frame) 
     borderFrames.l:SetPoint("TOPRIGHT",frame,"TOPLEFT") borderFrames.l:SetPoint("BOTTOMRIGHT",frame,"BOTTOMLEFT")
-    borderFrames.tl = CreateFrame("Frame",nil,frame) 
     borderFrames.tl:SetPoint("TOPRIGHT",borderFrames.t,"TOPLEFT") borderFrames.tl:SetPoint("BOTTOMLEFT",borderFrames.l,"TOPLEFT")
-    borderFrames.tr = CreateFrame("Frame",nil,frame) 
     borderFrames.tr:SetPoint("TOPLEFT",borderFrames.t,"TOPRIGHT") borderFrames.tr:SetPoint("BOTTOMRIGHT",borderFrames.r,"TOPRIGHT")
-    borderFrames.bl = CreateFrame("Frame",nil,frame) 
     borderFrames.bl:SetPoint("BOTTOMRIGHT",borderFrames.b,"BOTTOMLEFT") borderFrames.bl:SetPoint("TOPLEFT",borderFrames.l,"BOTTOMLEFT")
-    borderFrames.br = CreateFrame("Frame",nil,frame) 
-    borderFrames.br:SetPoint("BOTTOMLEFT",borderFrames.b,"BOTTOMRIGHT") borderFrames.br:SetPoint("TOPRIGHT",borderFrames.r,"BOTTOMRIGHT")
+    borderFrames.br:SetPoint("BOTTOMLEFT",borderFrames.b,"BOTTOMRIGHT") borderFrames.br:SetPoint("TOPRIGHT",borderFrames.r,"BOTTOMRIGHT") 
+    borderFrames.t:SetHeight(R:Round(RBG.db.borderWidth,R.pix)) borderFrames.b:SetHeight(R:Round(RBG.db.borderWidth,R.pix))
+    borderFrames.l:SetWidth(R:Round(RBG.db.borderWidth,R.pix)) borderFrames.r:SetWidth(R:Round(RBG.db.borderWidth,R.pix)) ]]
 
-    borderFrames.t:SetHeight(RBG.db.borderWidth*R.pix) borderFrames.b:SetHeight(RBG.db.borderWidth*R.pix)
-    borderFrames.l:SetWidth(RBG.db.borderWidth*R.pix) borderFrames.r:SetWidth(RBG.db.borderWidth*R.pix)
-    for _,bd in pairs(borderFrames) do bd.tex=bd:CreateTexture(nil,"BORDER") bd.tex:SetColorTexture(rgb(RBG.db.bdColor)) bd.tex:SetAllPoints() bd:Show() end
+    
+    borderFrames.tl:SetPoint("BOTTOMRIGHT",frame,"TOPLEFT",R.pix,-R.pix) 
+    borderFrames.tr:SetPoint("BOTTOMLEFT",frame,"TOPRIGHT",-R.pix,-R.pix)
+    borderFrames.bl:SetPoint("TOPRIGHT",frame,"BOTTOMLEFT",R.pix,R.pix) 
+    borderFrames.br:SetPoint("TOPLEFT",frame,"BOTTOMRIGHT",-R.pix,R.pix)
+
+    borderFrames.t:SetPoint("TOPLEFT",borderFrames.tl,"TOPRIGHT")   borderFrames.t:SetPoint("BOTTOMRIGHT",borderFrames.tr,"BOTTOMLEFT")
+    borderFrames.r:SetPoint("TOPLEFT",borderFrames.tr,"BOTTOMLEFT") borderFrames.r:SetPoint("BOTTOMRIGHT",borderFrames.br,"TOPRIGHT")
+    borderFrames.b:SetPoint("TOPLEFT",borderFrames.bl,"TOPRIGHT")   borderFrames.b:SetPoint("BOTTOMRIGHT",borderFrames.br,"BOTTOMLEFT")
+    borderFrames.l:SetPoint("TOPLEFT",borderFrames.tl,"BOTTOMLEFT") borderFrames.l:SetPoint("BOTTOMRIGHT",borderFrames.bl,"TOPRIGHT")
+
+    for _,b in pairs{borderFrames.tl, borderFrames.tr, borderFrames.bl, borderFrames.br} do 
+        local dim = R:Round(RBG.db.borderWidth, R.pix)
+        b:SetSize(dim,dim) 
+    end
+    
+    for _,bd in pairs(borderFrames) do bd.tex=bd:CreateTexture(nil,"BORDER") bd.tex:SetVertexColor(rgb(RBG.db.bdColor)) bd.tex:SetAllPoints() bd:Show() bd:SetFrameLevel(50)end
 
     RBG.borders[borderFrames] = true
 
@@ -334,21 +363,23 @@ end
 
 function RBG:UpdateBorders()
     for border in pairs(RBG.borders) do
-        --RBG:UpdateBorder(border)
+        RBG:UpdateBorder(border)
     end
 end
 
 function RBG:UpdateBorder(border, width, color, level)
-    local border, width, color, level = border or self.borders, width*R.pix or RBG.db.borderWidth*R.pix, color or RBG.db.bdColor, level or 20
-    border.t:SetHeight(width) border.b:SetHeight(width)
-    border.l:SetWidth(width) border.r:SetWidth(width)
+    local border, width, color, level = border or self.borders, R:Round(width,R.pix) or R:Round(RBG.db.borderWidth,R.pix), color or RBG.db.bdColor, level or 20
+    for _,b in pairs{border.tl, border.tr, border.bl, border.br} do 
+        local dim = R:Round(RBG.db.borderWidth, R.pix)
+        b:SetSize(dim,dim) 
+    end
     for _,bd in pairs(border) do bd.tex:SetColorTexture(rgb(color)) bd.tex:SetAllPoints() bd:Show() bd:SetFrameLevel(level) end
 end
 
 function RBG:OnInitialize()
     self.db = R.db.bgFrames
     self.statusbars = R.statusbars
-    self.powerBarHeight = R:Round(self.db.frameHeight / 5)
+    self.powerBarHeight = R:Round(self.db.frameHeight / 5, R.pix)
 
     self.HeaderFrame = RBG:CreateHeader()
     self.HeaderFrame:Show()

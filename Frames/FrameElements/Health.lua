@@ -3,6 +3,8 @@ local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 local RBG = R.bgFrames
 local LSM = R.Libs.LSM
 
+local rand = math.random
+
 function RBG:BuildHealthBar(frame)
     local healthBar = CreateFrame("StatusBar", frame:GetName().."HealthBar", frame)
     healthBar.background = healthBar:CreateTexture(nil, "BORDER")
@@ -34,6 +36,7 @@ function RBG:BuildHealthBar(frame)
 end
 
 function RBG:UpdateHealthDynamic(frame)
+    if RBG.testMode then return end
     if frame.enemy and frame.enemy.maxHealth and frame.enemy.currentHealth then
         self:SetValue(frame.enemy.currentHealth / frame.enemy.maxHealth)
     else
@@ -47,14 +50,15 @@ function RBG:UpdateHealthStatic(frame)
     --print("parent dimensions: ", frame:GetWidth(), ", ", frame:GetHeight())
     rightBox, leftBox, border = frame.rightBox, frame.leftBox, RBG.db.borderWidth
     
-    local bottomHeight = frame.powerBar:IsActive() and ((RBG.powerBarHeight + border) * R.pix) or 0
+    local bottomHeight = frame.powerBar:IsActive() and R:Round(RBG.powerBarHeight - border, R.pix) or 0
 
     local bdColor, bgColor, hpColor = RBG.db.bdColor, RBG.db.bgColor, RBG.db.barColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
-    
 
-    if frame.enemy and frame.enemy.class and RBG.db.classColorBars then
-        self:SetStatusBarColor(R:classColor(frame.enemy.class))
+    local enemy = RBG.testMode and frame.testenemy or frame.enemy    
+
+    if enemy and enemy.class and RBG.db.classColorBars then
+        self:SetStatusBarColor(R:classColor(enemy.class))
     else
         local c = RBG.db.barColor
         self:SetStatusBarColor(c.r, c.g, c.b, c.a)
@@ -77,7 +81,10 @@ function RBG:UpdateHealthStatic(frame)
         self:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,bottomHeight)
     end
 
-    if frame.enemy and frame.enemy.currentHealth and frame.enemy.maxHealth then
+    if frame.Name then frame.Name:SetAllPoints(self) end            --reset the name text so it doesnt dissapear
+
+    if RBG.testMode then self:SetValue(rand())
+    elseif frame.enemy and frame.enemy.currentHealth and frame.enemy.maxHealth then
         self:SetValue(frame.enemy.currentHealth / frame.enemy.maxHealth)
     else
         self:SetValue(1)

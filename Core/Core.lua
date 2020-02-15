@@ -1,7 +1,7 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
 ---Lua Functions---
-local _G, gsub, strjoin, twipe, tinsert, tremove, tContains, floor, sign = _G, gsub, strjoin, wipe, tinsert, tremove, tContains, floor, math.sign
+local _G, gsub, strjoin, twipe, tinsert, tremove, tContains, floor, sign, strupper = _G, gsub, strjoin, wipe, tinsert, tremove, tContains, floor, math.sign, strupper
 ---Wow API Functions---
 local AddMessage = AddMessage
 local CreateFrame = CreateFrame
@@ -74,9 +74,15 @@ function R:LoadCommands()
 end
 
 function R:TextInput(msg)
-	local arg1 = self:GetArgs(msg)
-	if arg1 == "hide" or arg1 == "Hide" then
+	local arg1, arg2 = self:GetArgs(msg, 2)
+	if arg1 and strupper(arg1) == "HIDE" then
 		RBG:Hide()
+	elseif arg1 and strupper(arg1) == "LOCK" then
+		RBG:Lock()
+	elseif arg1 and strupper(arg1) == "UNLOCK" then
+		RBG:Unlock()
+	elseif arg1 and strupper(arg1) == "TEST" then
+		RBG:TestToggle(arg2)
 	else
 		self:ToggleOptionsUI(msg)
 	end
@@ -87,7 +93,7 @@ end
 ---Utility Functions---
 
 function R:PixelScale()
-	R.pix = (768.0/string.match(({GetScreenResolutions()})[GetCurrentResolution()], "%d+x(%d+)"))/GetCVar("uiScale")
+	R.pix = (768.0/string.match(({GetScreenResolutions()})[GetCurrentResolution()], "%d+x(%d+)"))/0.64    --GetCVar("uiScale")
 end
 
 --Enable Smoothing--
@@ -120,6 +126,7 @@ end
 
 --Return rounded number
 function R:Round(n, mult)
+	if not n then return end
 	mult = mult or 1
 	return floor(n/mult + (n>=0 and 1 or -1) * 0.5) * mult
 end
@@ -205,18 +212,18 @@ end
 --Bump a frame so it aligns to the pixel grid
 local function BumpFrame(self)
 	self:StopMovingOrSizing()
-	local xOfs, yOfs = R.UIParent:GetLeft() - UIParent:GetLeft(), R.UIParent:GetTop() - UIParent:GetTop()
-	local xPos, yPos = self:GetLeft(), self:GetTop()
+	local xOfs, yOfs = R:Round(R.UIParent:GetLeft() - UIParent:GetLeft(),R.pix), R:Round(R.UIParent:GetTop() - UIParent:GetTop(),R.pix)
+	local xPos, yPos = R:Round(self:GetLeft(),R.pix), R:Round(self:GetTop(),R.pix)
 	R:Print(xPos, yPos)
-	xPos = R:Round(xPos - xOfs, R.pix)
-	yPos = R:Round(yPos + yOfs, R.pix)
+	xPos = xPos - xOfs
+	yPos = yPos + yOfs
 	R:Print(xPos, yPos, xOfs, yOfs)
 
 	R.db.locations[self:GetName()] = {xPos, yPos}
 
 	self:ClearAllPoints()
-	self:SetPoint("TOPLEFT",R.UIParent,"BOTTOMLEFT", xPos, yPos)
-	
+	--self:SetPoint("TOPLEFT",R.UIParent,"BOTTOMLEFT", xPos, yPos)			--I don't actually think this is needed as long as I scale everything so it lines up
+																			-- keeping it for now just in case
 end
 
 --Add mover to frame--

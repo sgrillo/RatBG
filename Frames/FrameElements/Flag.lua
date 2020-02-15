@@ -32,19 +32,24 @@ function RBG:BuildFlag(frame)
 end
 
 function RBG:UpdateFlagStatic(frame)
-    local offset = RBG.db.flag.flagOffset * R.pix
+    local offset = R:Round(RBG.db.flag.flagOffset, R.pix)
     R:Print("flag:",offset, R.pix)
     self:SetPoint("LEFT",frame,"LEFT", offset,0)
     local dim = RBG.db.flag.flagSize
     self:SetSize(dim, dim)
-    if (not RBG.db.flag.trackFlag) or (not frame.enemy) or (not frame.enemy.flag) then 
+    local enemy = RBG.testMode and frame.testenemy or frame.enemy
+    if (not RBG.db.flag.trackFlag) or (not enemy) or (not enemy.flag) then 
         self.active = false
         self:Hide()
         return
+    else
+        self.active = true
+        self:Show()
     end
 end
 
 function RBG:UpdateFlagDynamic(frame)
+    if RBG.testMode then return end
     if RBG.db.flag.trackFlag and frame.enemy and frame.enemy.flag then
         self.active = true
         self:Show()
