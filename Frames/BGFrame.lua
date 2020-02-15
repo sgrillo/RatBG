@@ -11,7 +11,6 @@ local GetInstanceInfo = GetInstanceInfo
 local InCombatLockdown = InCombatLockdown
 
 local MAXFRAMES = T.general.maxFrames
-local pix = R.pix
 
 RBG.frames = {}
 RBG.statusbars = {}
@@ -33,7 +32,7 @@ function RBG:CreateHeader()
     ParentFrame.background = ParentFrame:CreateTexture(nil,"BACKGROUND")
     ParentFrame.background:SetColorTexture(c.r,c.g,c.b,c.a)
     ParentFrame.background:SetAllPoints()
-    ParentFrame:SetSize(self.db.frameWidth*pix, self.db.frameHeight*pix)
+    ParentFrame:SetSize(self.db.frameWidth*R.pix, self.db.frameHeight*R.pix)
     ParentFrame.title = ParentFrame:CreateFontString(nil,"ARTWORK", "GameFontNormal")
     ParentFrame.title:SetAllPoints()
     ParentFrame.title:SetText(T.RatBlue.displayText.."RatBG Frames")
@@ -65,6 +64,7 @@ function RBG:BuildFrame(name)
     frame.healthBar = RBG:BuildHealthBar(frame)
     frame.powerBar = RBG:BuildPowerBar(frame)
     frame.Name = RBG:BuildNameText(frame)
+    frame.flag = RBG:BuildFlag(frame)
     --frame.leftBox.Rank = RBG:BuildRank(frame)
     --frame.leftBox.Class = RBG:BuildClassIcon(frame)
     --frame.rightBox.Trinket = RBG:BuildTrinketIcon(frame)
@@ -103,7 +103,7 @@ function RBG:BuildGroup(header)
     local prevFrame
     for _,frame in ipairs(RBG.frames) do
         prevFrame = prevFrame or header
-        frame:SetPoint("TOPLEFT",prevFrame,"BOTTOMLEFT",0,-RBG.db.barSpacing*pix)  --if no spacing, overlap the borders
+        frame:SetPoint("TOPLEFT",prevFrame,"BOTTOMLEFT",0,-RBG.db.barSpacing*R.pix)  --if no spacing, overlap the borders
         prevFrame = frame
     end
 end
@@ -117,6 +117,14 @@ end
 
 function RBG:Show()                         -- todo stop updates
     RBG:AssignEnemies()
+end
+
+function RBG:Lock()
+    RBG.HeaderFrame:lock()
+end
+
+function RBG:Unlock()
+    RBG.HeaderFrame:unlock()
 end
 
 ----Enemy Assignment-----
@@ -230,7 +238,8 @@ end
 
 function RBG:UpdateStatic(frame)
     --print(frame:GetName())
-    frame:SetSize(RBG.db.frameWidth*pix, RBG.db.frameHeight*pix)
+    frame:SetSize(RBG.db.frameWidth*R.pix, RBG.db.frameHeight*R.pix)
+    R:Print(frame:GetWidth(), frame:GetHeight(), R.pix)
     for element in pairs(frame.elements) do
         element:updateStatic(frame)
         if element:IsActive() and element:GetParent():IsActive() then 
@@ -253,7 +262,7 @@ end
 function RBG:UpdateDynamic(frame)
     if RBG.pendingUpdate[frame] then
         for element in pairs(frame.elements) do
-            if element:IsActive() then element:updateDynamic(frame) end
+            element:updateDynamic(frame)
         end
         RBG.pendingUpdate[frame] = nil
     end
@@ -313,8 +322,8 @@ function RBG:AddBorder()
     borderFrames.br = CreateFrame("Frame",nil,frame) 
     borderFrames.br:SetPoint("BOTTOMLEFT",borderFrames.b,"BOTTOMRIGHT") borderFrames.br:SetPoint("TOPRIGHT",borderFrames.r,"BOTTOMRIGHT")
 
-    borderFrames.t:SetHeight(RBG.db.borderWidth*pix) borderFrames.b:SetHeight(RBG.db.borderWidth*pix)
-    borderFrames.l:SetWidth(RBG.db.borderWidth*pix) borderFrames.r:SetWidth(RBG.db.borderWidth*pix)
+    borderFrames.t:SetHeight(RBG.db.borderWidth*R.pix) borderFrames.b:SetHeight(RBG.db.borderWidth*R.pix)
+    borderFrames.l:SetWidth(RBG.db.borderWidth*R.pix) borderFrames.r:SetWidth(RBG.db.borderWidth*R.pix)
     for _,bd in pairs(borderFrames) do bd.tex=bd:CreateTexture(nil,"BORDER") bd.tex:SetColorTexture(rgb(RBG.db.bdColor)) bd.tex:SetAllPoints() bd:Show() end
 
     RBG.borders[borderFrames] = true
@@ -330,7 +339,7 @@ function RBG:UpdateBorders()
 end
 
 function RBG:UpdateBorder(border, width, color, level)
-    local border, width, color, level = border or self.borders, width*pix or RBG.db.borderWidth*pix, color or RBG.db.bdColor, level or 20
+    local border, width, color, level = border or self.borders, width*R.pix or RBG.db.borderWidth*R.pix, color or RBG.db.bdColor, level or 20
     border.t:SetHeight(width) border.b:SetHeight(width)
     border.l:SetWidth(width) border.r:SetWidth(width)
     for _,bd in pairs(border) do bd.tex:SetColorTexture(rgb(color)) bd.tex:SetAllPoints() bd:Show() bd:SetFrameLevel(level) end

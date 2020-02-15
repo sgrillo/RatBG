@@ -3,7 +3,7 @@ local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 local RBG, Scanner = R.bgFrames, R.scanner
 
 --lua functions
-local strmatch = strmatch
+local strmatch, strupper = strmatch, strupper
 --Wow API
 local InCombatLockdown, GetServerTime, GetTime = InCombatLockdown, GetServerTime, GetTime
 
@@ -16,23 +16,24 @@ local BGSize = {} BGSize["Warsong Gulch"] = 10 BGSize["Arathi Basin"] = 15
 function Scanner:CheckZone()
     local zone = GetInstanceInfo()
     if zone == "Warsong Gulch" then
-        Scanner.zone = zone 
+        Scanner.zone = zone
+        scanner:SetScript("OnUpdate", Scanner.search) 
         Scanner:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
-        scanner:SetScript("OnUpdate", Scanner.search)
         Scanner:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+        Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagMessage")
+        Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagMessage")
     else
         RBG:Clear()
+        scanner:SetScript("OnUpdate", nil)
         Scanner:UnregisterEvent("UPDATE_BATTLEFIELD_SCORE")
         Scanner:UnregisterEvent("UPDATE_MOUSEOVER_UNIT")
-        scanner:SetScript("OnUpdate", nil)
+        Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagMessage")
+        Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagMessage")
     end
 
 end
 
-function Scanner:OnInitialize()
-    self:RegisterEvent("PLAYER_ENTERING_WORLD","CheckZone")
-    
-end
+
 
 function Scanner:search()
     if GetTime() < updateTimer then return end
@@ -66,7 +67,7 @@ function Scanner:updateUnits(seen)
         if frame then
             local enemy = RBG.frameNames[name].enemy
             if enemy then
-                print("found enemy: "..name) 
+                --print("found enemy: "..name) 
                 enemy.maxHealth = UnitHealthMax(id)
                 enemy.currentHealth = UnitHealth(id)
                 _, enemy.powerType = UnitPowerType(id)
@@ -153,5 +154,37 @@ function Scanner:PLAYER_REGEN_ENABLED()
     Scanner:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
 end
 
+local function ClearFlags()
+    for i,enemy in ipairs(RBG.enemies) do
+        if enemy.flag then 
+            enemy.flag = false
+            RBG.pendingUpdate[RBG.frames[i]] = true
+        end
+    end
+end
+
+function Scanner:FlagMessage(event, ...)
+    local friendly, msg = strmatch(event, strupper(R.myfaction)), select(1,...)
+    if msg and strmatch(msg, "captured") then
+        ClearFlags()
+    elseif friendly and msg and strmatch(msg, "dropped") then
+        ClearFlags()
+    elseif not friendly and msg and strmatch(msg, "picked up") then
+        ClearFlags()
+        local name = select(5,...)
+        local frame = RBG.frameNames[name]
+        R:Print(name.." picked up flag")
+        if frame and frame.enemy then
+            R:Print(frame:GetName()) 
+            frame.enemy.flag = true 
+            RBG.pendingUpdate[frame] = true
+        end
+    end
+end
+
+function Scanner:OnInitialize()
+    self:RegisterEvent("PLAYER_ENTERING_WORLD","CheckZone")
+    
+end
 
 

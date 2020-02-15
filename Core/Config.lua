@@ -7,7 +7,7 @@ R.Libs.AceConfig:RegisterOptionsTable(R.AddonName, R.Options)
 R.Libs.AceConfigDialog:SetDefaultSize(R.AddonName, R:GetConfigDefaultSize())
 
 local RBG = R.bgFrames
-
+math_min = math.min
 
 R.Options.childGroups = "tab"
 
@@ -49,6 +49,7 @@ R.Options.args.BattlegroundBars = {
 					get = function() return tonumber(R.db.bgFrames.frameWidth) end,
 					set = function(info,value) 
 						R.db.bgFrames[info[#info]] = value
+						R.db.bgFrames.flag.flagOffset = math_min(value, R.db.bgFrames.flag.flagOffset)
 						RBG:UpdateAllStatic()
 					end
 				},

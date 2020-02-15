@@ -52,7 +52,7 @@ local function LookupPowerType(frame)
 end
 
 function RBG:UpdatePowerDynamic(frame)
-    if not frame.enemy then return end
+    if not frame.enemy then self:SetValue(1) return end
     local power, maxPower = frame.enemy.currentPower, frame.enemy.maxPower
     if frame.enemy.class == "Druid" then     --need to check if we need to change bar color
         if RBG.db.trackPower == "All" then
@@ -75,6 +75,23 @@ function RBG:UpdatePowerStatic(frame)
 
     local bdColor, bgColor = RBG.db.bdColor, RBG.db.bgColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
+
+    self:ClearAllPoints()
+
+    if leftBox:IsActive() then
+        --print("left box anchor")
+        self:SetPoint("BOTTOMLEFT",leftBox,"BOTTOMRIGHT")
+    else
+        --print("left frame anchor")
+        self:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT")
+    end
+    if rightBox:IsActive() then
+        --print("right box anchor")
+        self:SetPoint("TOPRIGHT",rightBox,"BOTTOMLEFT",0,bottomHeight)
+    else
+        --print("right frame anchor")
+        self:SetPoint("TOPRIGHT",frame,"BOTTOMRIGHT",0,bottomHeight)
+    end
     
 
     --Handle powerBar Display Settings
@@ -100,21 +117,10 @@ function RBG:UpdatePowerStatic(frame)
     
     frame.healthBar:updateStatic(frame)             --make sure to force update the health bar to ensure its sized correctly
 
-    self:ClearAllPoints()
-
-    if leftBox:IsActive() then
-        --print("left box anchor")
-        self:SetPoint("BOTTOMLEFT",leftBox,"BOTTOMRIGHT")
+    if frame.enemy and frame.enemy.currentPower and frame.enemy.maxPower then
+        self:SetValue(frame.enemy.currentPower / frame.enemy.maxPower)
     else
-        --print("left frame anchor")
-        self:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT")
-    end
-    if rightBox:IsActive() then
-        --print("right box anchor")
-        self:SetPoint("TOPRIGHT",rightBox,"BOTTOMLEFT",0,bottomHeight)
-    else
-        --print("right frame anchor")
-        self:SetPoint("TOPRIGHT",frame,"BOTTOMRIGHT",0,bottomHeight)
+        self:SetValue(1)
     end
 
     --self:SetValue(math.random())
