@@ -22,6 +22,7 @@ function Scanner:CheckZone()
         Scanner:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagMessage")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagMessage")
+        if RBG.testMode then RBG:TestToggle() end
     else
         RBG:Clear()
         scanner:SetScript("OnUpdate", nil)

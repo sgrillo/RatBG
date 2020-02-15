@@ -26,7 +26,7 @@ RBG.testMode = false
 
 ------Create Frames-------
 
-function RBG:CreateHeader()
+function RBG:BuildHeader()
     local ParentFrame = CreateFrame("Frame","RatBG Frames", R.UIParent)
     local c = A.bgFrames.bgColor
     ParentFrame.background = ParentFrame:CreateTexture(nil,"BACKGROUND")
@@ -44,7 +44,8 @@ function RBG:CreateHeader()
     end
     R:MakeDraggable(ParentFrame)
     R.fontStrings[ParentFrame.title] = true
-    ParentFrame:unlock()
+
+    ParentFrame:Hide()
 
     return ParentFrame
 
@@ -54,7 +55,8 @@ function RBG:BuildFrame(name)
     local frame = CreateFrame("Button", name, UIParent, "SecureActionButtonTemplate")
     tinsert(RBG.frames, frame)
 
-    frame.enemy = {}
+    frame.enemy = nil
+    frame.testenemy = nil
     frame.elements = {}
     frame.staticUpdates = {}
     frame.dynamicUpdates = {}
@@ -81,7 +83,7 @@ function RBG:BuildFrame(name)
     frame.init = false
     frame.active = false
 
-    frame:Hide()
+    frame.GetEnemy = function() return RBG.testMode and frame.testenemy or frame.enemy end 
 
     frame.IsActive = function() return frame.active end
 
@@ -90,10 +92,11 @@ function RBG:BuildFrame(name)
     frame.hoverLayer = CreateFrame("Frame",frame:GetName().."Hover",frame)
     frame.hoverLayer:SetAllPoints()
     frame.hoverLayer:SetFrameLevel(frame:GetFrameLevel()+100)                       --make sure this is on top
-
     frame.hoverLayer:AddBorder()
 
     frame:SetScript("OnUpdate", function() RBG:UpdateDynamic(frame) end)
+
+    frame:Hide()
 
     return frame
 end
@@ -131,9 +134,11 @@ end
 
 function RBG:Lock()
     RBG.HeaderFrame:lock()
+    if not RBG.db.showHeader then RBG.HeaderFrame:Hide() end
 end
 
 function RBG:Unlock()
+    RBG.HeaderFrame:Show()
     RBG.HeaderFrame:unlock()
 end
 
@@ -142,8 +147,11 @@ function RBG:TestToggle(num)
     if RBG.testMode then 
         GenerateTestInfo(num)
         RBG:AssignEnemies(num)
+    else
+        RBG:AssignEnemies()
     end
     RBG:UpdateAll()
+    R:Print("Test Mode ", RBG.testMode and "on" or "off")
 end 
     
 
@@ -210,6 +218,7 @@ function RBG:Clear()
         frame.enemy = nil
         frame:Hide()
     end
+    if not RBG.db.showHeader then RBG.HeaderFrame:Hide() end
 end
 
 
@@ -239,20 +248,14 @@ end
 
 --------Updates--------
 
-function RBG:PLAYER_ENTERING_WORLD()
-    self:UpdateAllStatic()
-    self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-end
-
 function RBG:UpdateAll()
     self.UpdateAllStatic()
-    --self.UpdateAllDynamic()
+    self.UpdateAllDynamic()
 end
 
 function RBG:UpdateStatic(frame)
     --print(frame:GetName())
     frame:SetSize(R:Round(RBG.db.frameWidth,R.pix), R:Round(RBG.db.frameHeight,R.pix))
-    R:Print(frame:GetWidth(), frame:GetHeight(), R.pix)
     for element in pairs(frame.elements) do
         element:updateStatic(frame)
         if element:IsActive() and element:GetParent():IsActive() then 
@@ -264,6 +267,8 @@ end
 
 function RBG:UpdateAllStatic()
     RBG.HeaderFrame:SetSize(R:Round(RBG.db.frameWidth,R.pix), R:Round(RBG.db.frameHeight,R.pix))
+    if RBG.db.showHeader and not RBG.HeaderFrame:IsShown() then RBG.HeaderFrame:Show()
+    elseif not RBG.db.showHeader and RBG.HeaderFrame:IsShown() then RBG.HeaderFrame:Hide() end
     RBG.UpdateBarTextures()
     RBG:UpdateBorders()
     RBG.powerBarHeight = R:Round(RBG.db.frameHeight / 5, R.pix)
@@ -382,8 +387,8 @@ function RBG:OnInitialize()
     self.statusbars = R.statusbars
     self.powerBarHeight = R:Round(self.db.frameHeight / 5, R.pix)
 
-    self.HeaderFrame = RBG:CreateHeader()
-    self.HeaderFrame:Show()
+    self.HeaderFrame = RBG:BuildHeader()
+    --self.HeaderFrame:Show()
 
     for i=1,MAXFRAMES do
         local frame = self:BuildFrame("RatBGFrame"..i)
@@ -396,10 +401,7 @@ function RBG:OnInitialize()
 
     ---DEBUG fill frames with dummy data---
     self:AssignEnemies()
-
     self:UpdateAllStatic()
-
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
     
 end
 

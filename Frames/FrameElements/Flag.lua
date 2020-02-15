@@ -33,7 +33,6 @@ end
 
 function RBG:UpdateFlagStatic(frame)
     local offset = R:Round(RBG.db.flag.flagOffset, R.pix)
-    R:Print("flag:",offset, R.pix)
     self:SetPoint("LEFT",frame,"LEFT", offset,0)
     local dim = RBG.db.flag.flagSize
     self:SetSize(dim, dim)

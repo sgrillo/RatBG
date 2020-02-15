@@ -53,7 +53,7 @@ A.bgFrames = {
 	freedomHighlight = true,
 	fapHighlight = true,
 	targetCount = false,
-	
+	showHeader = true
 }
 
 A.font = {

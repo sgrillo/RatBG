@@ -337,6 +337,30 @@ R.Options.args.BattlegroundBars = {
 					desc = "Lists the player's Realm name with their name"
 				},
 			}
+		},
+		miscGroup = {
+			name = "Misc",
+			type = "group",
+			order = 8,
+			inline = true,
+			get = function(info) return R.db.bgFrames[info[#info]] end,
+			set = function(info, value) R.db.bgFrames[info[#info]] = value RBG:UpdateAllStatic() end,
+			args = {
+				showHeader = {
+					order = 1,
+					type = "toggle",
+					name = "Show Header Frame"
+				},
+				updateFreq = {
+					order = 1,
+					type = "range",
+					name = "Scan Frequency",
+					desc = "How often the scanner checks for nearby enemy players",
+					min=0.1,max=5,step=0.05,
+					get = function(info) return tonumber(R.db.scanner[info[#info]]) end,
+					set = function(info, value) R.db.scanner[info[#info]] = value end
+				}
+			}
 		}
 	}
 }

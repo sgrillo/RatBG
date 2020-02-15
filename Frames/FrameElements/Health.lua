@@ -55,7 +55,7 @@ function RBG:UpdateHealthStatic(frame)
     local bdColor, bgColor, hpColor = RBG.db.bdColor, RBG.db.bgColor, RBG.db.barColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
 
-    local enemy = RBG.testMode and frame.testenemy or frame.enemy    
+    local enemy = frame:GetEnemy()   
 
     if enemy and enemy.class and RBG.db.classColorBars then
         self:SetStatusBarColor(R:classColor(enemy.class))
@@ -84,8 +84,8 @@ function RBG:UpdateHealthStatic(frame)
     if frame.Name then frame.Name:SetAllPoints(self) end            --reset the name text so it doesnt dissapear
 
     if RBG.testMode then self:SetValue(rand())
-    elseif frame.enemy and frame.enemy.currentHealth and frame.enemy.maxHealth then
-        self:SetValue(frame.enemy.currentHealth / frame.enemy.maxHealth)
+    elseif enemy and enemy.currentHealth and enemy.maxHealth then
+        self:SetValue(enemy.currentHealth / enemy.maxHealth)
     else
         self:SetValue(1)
     end
