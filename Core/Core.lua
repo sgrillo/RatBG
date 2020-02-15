@@ -140,23 +140,29 @@ end
 
 --Simpler Font Formatting--
 local function BuildFont(f, font, size, outline, color, shadow)
+	f.font, f.size, f.outline, f.color, f.shadow = font, size, outline, color, shadow
 	font = font or LSM:Fetch("font", R.db.font.font)
 	if not size or size <=0 then size = R.db.font.size end
 	outline = outline or R.db.font.outline
 	color = color or R.db.font.color
 	shadow = shadow or R.db.font.shadow
 
-	f.font, f.size, f.outline, f.color, f.shadow = font, size, outline, color, shadow
-
 	f:SetFont(font, size, outline)
-	f:SetTextColor(color)
+	f:SetTextColor(rgb(color))
 	
 	if outline=="NONE" then
-		f:SetShadowColor(shadow.color)
+		f:SetShadowColor(rgb(shadow.Color))
 		f:SetShadowOffset(shadow.Offset.x,shadow.Offset.y)
 	end
 
 	R.fontStrings[f] = true
+end
+
+function R:UpdateFonts()
+	--local font = LSM:Fetch("font", R.db.font.font)
+	for fs in pairs(R.fontStrings) do
+		fs:BuildFont(fs.font, fs.size, fs.outline, fs.color, fs.shadow)
+	end
 end
 
 --Attach to font objects--

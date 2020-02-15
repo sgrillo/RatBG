@@ -13,20 +13,27 @@ local classes = {"Warrior","Paladin","Hunter","Rogue","Priest","Shaman","Mage","
 local powerTypes = {"Mana","Energy","Rage"}
 
 --make some full names
-do 
+local function buildNames()
     for i=1,#names do
         local server = servers[rand(1, #servers)]
         fullnames[names[i]] =  names[i].."-"..server
     end
 end
 
+do 
+    buildNames()
+end
+
+
+
 function RBG:GenerateEnemy()
     --ensure names only get picked once
+    if #names <= 1 then buildNames() end
     local ndx = rand(1, #names + 1)
     local rname = names[ndx] or Rat
     local rfullname = fullnames[rname]
     fullnames[rname] = nil
-    if rname ~= "Rat" then tremove(names, ndx) end
+    if rname ~= Rat then tremove(names, ndx) end
     local rclass = forceWarlock[rname] and "Warlock" or forcePriest[rname] and "Priest" or forceDruid[rname] and "Druid" or forcePaladin[rname] and "Paladin" or forceHunter[rname] and "Hunter" or classes[rand(1,#classes)]
     local enemy = 
     {

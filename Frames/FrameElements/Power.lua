@@ -39,12 +39,12 @@ function RBG:BuildPowerBar(frame)
     return powerBar
 end
 
-local function LookupPowerType(frame)
-    if frame.enemy and frame.enemy.class then
-        local powerTypes, class = T.general.powerTypes, frame.enemy.class
+local function LookupPowerType(enemy)
+    if enemy.class then
+        local powerTypes, class = T.general.powerTypes, enemy.class
         --handle druids because they're silly
         if class == "Druid" then
-            return RBG.db.trackPower == "All" and frame.enemy.powerType or "Mana"
+            return RBG.db.trackPower == "All" and enemy.powerType or "Mana"
         end
         return powerTypes.Mana[class] and "Mana" or powerTypes.Energy[class] and "Energy" or powerTypes.Rage[class] and "Rage"
     end
@@ -98,7 +98,7 @@ function RBG:UpdatePowerStatic(frame)
     --Handle powerBar Display Settings
     local type, enemy = "Mana", RBG.testMode and frame.testenemy or frame.enemy
     if enemy then
-        type = LookupPowerType(frame) or type
+        type = LookupPowerType(enemy) or type
     end
 
     if RBG.db.trackPower == "None" then

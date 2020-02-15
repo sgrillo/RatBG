@@ -4,7 +4,7 @@ local RBG = R.bgFrames
 local LSM = R.Libs.LSM
 
 --Lua functions
-local _G, tinsert, twipe, tsort, tremove, min, format = _G, tinsert, wipe, table.sort, table.remove, math.min, string.format
+local _G, tinsert, twipe, tsort, tremove, min, format, rand = _G, tinsert, wipe, table.sort, table.remove, math.min, string.format, math.random
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local GetInstanceInfo = GetInstanceInfo
@@ -115,6 +115,7 @@ local function GenerateTestInfo(num)
         local enemy = RBG:GenerateEnemy()
         tinsert(RBG.testenemies,enemy)
     end
+    RBG.testenemies[rand(1,min(num,MAXFRAMES))].flag = true
 end
 
 function RBG:Hide()                         -- todo stop updates

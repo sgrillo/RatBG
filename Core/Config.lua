@@ -178,7 +178,7 @@ R.Options.args.BattlegroundBars = {
 			name = "Font",
 			inline = true,
 			get = function(info) return R.db.font[info[#info]] end,
-			set = function(info, value) R.db.font[info[#info]] = value RBG:UpdateAllStatic() end,
+			set = function(info, value) R.db.font[info[#info]] = value R:UpdateFonts() RBG:UpdateAllStatic() end,
 			args = {
 				font = {
 					order = 1,
@@ -214,6 +214,7 @@ R.Options.args.BattlegroundBars = {
 					set = function(info, r, g, b, a) 
 						local c = R.db.font.color
 						c.r, c.g, c.b, c.a = r, g, b, a
+						R:UpdateFonts()
 						RBG:UpdateAllStatic()
 					end
 				},
@@ -230,6 +231,7 @@ R.Options.args.BattlegroundBars = {
 					set = function(info, r, g, b, a) 
 						local c = R.db.font.shadow.Color
 						c.r, c.g, c.b, c.a = r, g, b, a
+						R:UpdateFonts()
 						RBG:UpdateAllStatic()
 					end
 				}
