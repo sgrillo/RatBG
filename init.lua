@@ -104,6 +104,7 @@ function Addon:ToggleOptionsUI(msg)
 	if InCombatLockdown() then
 		self:Print(ERR_NOT_IN_COMBAT)
 		self:RegisterEvent("PLAYER_REGEN_ENABLED")
+		
 		return
 	end
 

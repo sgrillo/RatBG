@@ -209,13 +209,15 @@ function R:styleVarSliderBar(object, ...)
 			hightext:Point('TOPRIGHT', frame, 'BOTTOMRIGHT', -2, -2)
 		end
 	end
-	return	widget
+	return widget
 end
 
 
 function R:HookElvUISkins()
-	self:Hook(ACG, "Create",  "styleVarSliderBar")
-	for k,v in pairs(R.hooks[ACG]) do print(k,v) end
+	if _G.ElvUI then
+		self:RawHook(ACG, "Create",  "styleVarSliderBar")
+		for k,v in pairs(R.hooks[ACG]) do print(k,v) end
+	end
 end
 
 --Bump a frame so it aligns to the pixel grid
