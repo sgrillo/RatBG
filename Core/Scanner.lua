@@ -19,6 +19,7 @@ function Scanner:CheckZone()
         Scanner.zone = zone
         scanner:SetScript("OnUpdate", Scanner.search) 
         Scanner:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
+        Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "UPDATE_BATTLEFIELD_SCORE")
         Scanner:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagMessage")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagMessage")
@@ -30,6 +31,7 @@ function Scanner:CheckZone()
         Scanner:UnregisterEvent("UPDATE_MOUSEOVER_UNIT")
         Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagMessage")
         Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagMessage")
+        Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
     end
 
 end
@@ -109,7 +111,7 @@ function Scanner:UPDATE_BATTLEFIELD_SCORE()
 
     local found, exists = false, {} 
 
-    scoreTimer = GetServerTime() + (#RBG.enemies == BGSize[Scanner.zone] and 30 or 5)           --only check every 30s if the bg is full, incase someone leaves
+    scoreTimer = GetServerTime() + (#RBG.enemies == BGSize[Scanner.zone] and 30 or 3)           --only check every 30s if the bg is full, incase someone leaves
 
     for _,enemy in pairs(RBG.enemies) do
         exists[enemy.fullname] = true
