@@ -9,7 +9,7 @@ local function buildContainer(frame, side)
     container.dynamicUpdates = {}
     container.active = false
     container.side = side
-
+    container.attach = container
     --register everything
     frame.elements[container] = true
 
@@ -35,14 +35,16 @@ function RBG:UpdateContainerStatic(frame)
     local width = 0
     local active = frame.active
     self.active = false
-    for element in pairs(self.elements) do
-        --print("Attempting to update sub-element: "..element:GetName())
+    for _,element in ipairs(self.elements) do
         element:updateStatic(frame)
-        if element:IsActive() and frame:IsActive() then 
-            self:Show() 
-            element:Show()
-            width = width + element:GetWidth()
-            self.active = true            
+        if element:IsActive() then
+            container.attach = element
+            if frame:IsActive() then 
+                self:Show() 
+                element:Show()
+                width = width + element:GetWidth()
+                self.active = true
+            end            
         end
     end
     if self.active then

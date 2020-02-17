@@ -5,7 +5,7 @@
 --Credit goes to Tukz and the ElvUI team
 
 --Lua functions
-local _G, pairs, gsub, strsplit, unpack, wipe, type, tcopy = _G, pairs, gsub, strsplit, unpack, wipe, type, table.copy
+local pairs, gsub, strsplit, unpack, wipe, type, tcopy = pairs, gsub, strsplit, unpack, wipe, type, table.copy
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local GetTime = GetTime

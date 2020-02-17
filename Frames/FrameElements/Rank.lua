@@ -1,5 +1,7 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
+local tinsert = tinsert
+
 local RBG = R.bgFrames
 
 function RBG:BuildRank(frame)
@@ -15,10 +17,22 @@ function RBG:UpdateRankStatic(frame)
     rankIcon.icon = rankIcon.bg:CreateTexture(nil,"BORDER")
 
     rankIcon.staticUpdate = RBG.UpdateRankStatic
-    rankIcon.dynamicUpdate = RBG.UpdateRankDynamic
 
     --icon goes into container, not onto frame
+    tinsert(frame.leftBox.elements, rankIcon)
 
+    rankIcon.IsActive = function() return RBG.db.icons.rankIcon end
+
+    RBG:RegisterUpdates(rankIcon)
+
+end
+
+function RBG:UpdateRankStatic()
+    local enemy = frame:GetEnemy()
+
+    self.bg:SetColorTexture(rgb(RBG.db.bgColor))
+
+    if enemy and enemy.rank and enemy.rank > 0 then
 
 
 end

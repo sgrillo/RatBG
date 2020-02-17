@@ -1,7 +1,7 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
 ---Lua Functions---
-local _G, gsub, strjoin, twipe, tinsert, tremove, tContains, floor, sign, strupper = _G, gsub, strjoin, wipe, tinsert, tremove, tContains, floor, math.sign, strupper
+local gsub, strjoin, twipe, tinsert, tremove, tContains, floor, sign, strupper = gsub, strjoin, wipe, tinsert, tremove, tContains, floor, math.sign, strupper
 ---Wow API Functions---
 local AddMessage = AddMessage
 local CreateFrame = CreateFrame
@@ -36,6 +36,7 @@ local RBG, Scanner = R.bgFrames, R.scanner
 R.UIParent = CreateFrame("Frame", "RatBGParent", _G.UIParent)
 R.UIParent:SetSize(_G.UIParent:GetSize())
 R.UIParent:SetPoint("CENTER")
+R.UIParent:SetFrameLevel(0)
 
 function R:Initialize()
 	
@@ -169,7 +170,9 @@ end
 do
 	local dummy = CreateFrame("Frame")
 	getmetatable(dummy:CreateFontString()).__index.BuildFont = BuildFont
-	getmetatable(_G.GameFontNormal).__index.BuildFont = BuildFont
+	if not getmetatable(_G.GameFontNormal).__index.BuildFont  then 
+		getmetatable(_G.GameFontNormal).__index.BuildFont = BuildFont
+	end
 end
 
 --Table Copy--
@@ -211,7 +214,7 @@ end
 
 
 function R:HookElvUISkins()
-	self:RawHook(ACG, "Create",  "styleVarSliderBar")
+	self:Hook(ACG, "Create",  "styleVarSliderBar")
 	for k,v in pairs(R.hooks[ACG]) do print(k,v) end
 end
 

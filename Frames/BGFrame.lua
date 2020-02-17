@@ -4,7 +4,7 @@ local RBG = R.bgFrames
 local LSM = R.Libs.LSM
 
 --Lua functions
-local _G, tinsert, twipe, tsort, tremove, min, format, rand = _G, tinsert, wipe, table.sort, table.remove, math.min, string.format, math.random
+local tinsert, twipe, tsort, tremove, min, format, rand = tinsert, wipe, table.sort, table.remove, math.min, string.format, math.random
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local GetInstanceInfo = GetInstanceInfo
@@ -78,7 +78,7 @@ function RBG:BuildFrame(name)
     frame:SetAttribute("type2","macro")
     frame:SetAttribute("macrotext1","")
     frame:SetAttribute("macrotext2","")
-    frame:RegisterForClicks("AnyDown")
+    --frame:RegisterForClicks("AnyDown")
 
     frame.init = false
     frame.active = false
@@ -87,11 +87,11 @@ function RBG:BuildFrame(name)
 
     frame.IsActive = function() return frame.active end
 
-    RBG:RegisterUpdates(frame)
 
     frame.hoverLayer = CreateFrame("Frame",frame:GetName().."Hover",frame)
     frame.hoverLayer:SetAllPoints()
     frame.hoverLayer:SetFrameLevel(frame:GetFrameLevel()+100)                       --make sure this is on top
+    frame.hoverLayer.AddBorder = RBG.AddBorder
     frame.hoverLayer:AddBorder()
 
     frame:SetScript("OnUpdate", function() RBG:UpdateDynamic(frame) end)

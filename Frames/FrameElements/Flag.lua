@@ -2,7 +2,7 @@ local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
 local RBG = R.bgFrames
 
-min,max = math.min, math.max
+local min,max = math.min, math.max
 
 function RBG:BuildFlag(frame)
     local flagIcon = CreateFrame("Frame", frame:GetName().."FlagIcon", frame)
