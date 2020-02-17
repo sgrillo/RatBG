@@ -33,6 +33,7 @@ function RBG:UpdateRankStatic()
     self.bg:SetColorTexture(rgb(RBG.db.bgColor))
 
     if enemy and enemy.rank and enemy.rank > 0 then
+    end
 
 
 end
