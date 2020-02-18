@@ -38,7 +38,9 @@ function Scanner:CheckZone()
 
 end
 
-
+function Scanner:COMBAT_LOG_EVENT_UNFILTERED()
+    
+end
 
 function Scanner:search()
     if GetServerTime() > scoreTimer then
