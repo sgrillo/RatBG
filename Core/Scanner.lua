@@ -23,6 +23,7 @@ function Scanner:CheckZone()
         Scanner:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagMessage")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagMessage")
+        Scanner:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         if RBG.testMode then RBG:TestToggle() end
     else
         RBG:Clear()
@@ -32,6 +33,7 @@ function Scanner:CheckZone()
         Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagMessage")
         Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagMessage")
         Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
+        Scanner:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     end
 
 end

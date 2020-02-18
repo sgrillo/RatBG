@@ -10,4 +10,5 @@
   <Script file="Trinket.lua"/>
   <Script file="Containers.lua"/>
   <Script file="Flag.lua"/>
+  <Script file="Highlight.lua"/>
 </Ui>

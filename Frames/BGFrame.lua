@@ -67,6 +67,7 @@ function RBG:BuildFrame(name)
     frame.powerBar = RBG:BuildPowerBar(frame)
     frame.Name = RBG:BuildNameText(frame)
     frame.flag = RBG:BuildFlag(frame)
+    frame.highlight = BGG:BuildHighlight(frame)
     frame.leftBox.Rank = RBG:BuildRank(frame)
     frame.leftBox.Class = RBG:BuildClassIcon(frame)
     --frame.rightBox.Trinket = RBG:BuildTrinketIcon(frame)
@@ -84,13 +85,6 @@ function RBG:BuildFrame(name)
     frame.GetEnemy = function() return RBG.testMode and frame.testenemy or frame.enemy end 
 
     frame.IsActive = function() return frame.active end
-
-
-    frame.hoverLayer = CreateFrame("Frame",frame:GetName().."Hover",frame)
-    frame.hoverLayer:SetAllPoints()
-    frame.hoverLayer:SetFrameLevel(frame:GetFrameLevel()+100)                       --make sure this is on top
-    frame.hoverLayer.AddBorder = RBG.AddBorder
-    frame.hoverLayer:AddBorder()
 
     frame:SetScript("OnUpdate", function() RBG:UpdateDynamic(frame) end)
 
