@@ -279,7 +279,7 @@ end
 
 function RBG:UpdateDynamic(frame)
     if RBG.pendingUpdate[frame] then
-        for element in pairs(frame.elements) do
+        for _,element in ipairs(frame.elements) do
             element:updateDynamic(frame)
         end
         RBG.pendingUpdate[frame] = nil

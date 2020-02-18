@@ -118,7 +118,7 @@ function Scanner:UPDATE_BATTLEFIELD_SCORE()
     end
     
     for i=1,GetNumBattlefieldScores() do
-        local pname, _, _, _, _, pfaction, prank, _, pclass = GetBattlefieldScore(i)
+        local pname, _, _, _, _, pfaction, prank, _, _, pclass = GetBattlefieldScore(i)
         if pname then                                        --handle those stupid broken names
             if pfaction ~= R.myFactionID then
                 if exists[pname] then exists[pname] = nil end
@@ -135,7 +135,7 @@ function Scanner:UPDATE_BATTLEFIELD_SCORE()
                         maxMana = 100,
                         currentMana = 100,
                         powerType = "Mana",
-                        rank = prank,
+                        rank = prank > 0 and (prank - 4) or 0,
                         flag = false
                     }
                     RBG:AddEnemy(enemy)
