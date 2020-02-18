@@ -2,13 +2,13 @@ local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
 local RBG = R.bgFrames
 
-local tinsert, time = tinsert, GetServerTime
+local tinsert, servertime = tinsert, GetServerTime
 
 function RBG:BuildHighlight(frame)
 
     local highlight = CreateFrame("Frame",frame:GetName().."Hightlight",frame)
     highlight:SetAllPoints()
-    highlight:SetFrameLevel(frame:GetFrameLevel()+100)                       --make sure this is on top
+    highlight:SetFrameLevel(frame:GetFrameLevel()+15)                       --make sure this is on top
     
     highlight.staticUpdate = RBG.UpdateHighlight
     highlight.dynamicUpdate = RBG.UpdateHighlight
@@ -19,6 +19,8 @@ function RBG:BuildHighlight(frame)
     
     RBG:RegisterUpdates(highlight)
     highlight:AddBorder()
+
+    return highlight
 end
 
 
@@ -27,12 +29,12 @@ function RBG:UpdateHighlight(frame)
 
     local enemy = frame:GetEnemy()
 
-    if enemy and enemy.fapTime and enemy.fapTime > time then
-        RBG:UpdateBorder(self.border, RBG.db.borderWidth + 1, rgb(T.Media.fapColor))
-    elseif enemy and enemy.freedomTime and enemy.freedomTime > time then
-        RBG:UpdateBorder(self.border, RBG.db.borderWidth + 1, rgb(T.Media.freedomColor))
+    if enemy and enemy.fapTime and enemy.fapTime > servertime() then
+        self:UpdateBorder(RBG.db.borderWidth + 1, T.Media.fapColor, "OVERLAY")
+    elseif enemy and enemy.freedomTime and enemy.freedomTime > servertime() then
+        self:UpdateBorder(RBG.db.borderWidth + 1, T.Media.freedomColor, "OVERLAY")
     else
-        RBG:UpdateBorder(self.border)
+        self:UpdateBorder()
     end
 
 end

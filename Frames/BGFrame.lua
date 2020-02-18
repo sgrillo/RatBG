@@ -9,6 +9,7 @@ local tinsert, twipe, tsort, tremove, min, format, rand = tinsert, wipe, table.s
 local CreateFrame = CreateFrame
 local GetInstanceInfo = GetInstanceInfo
 local InCombatLockdown = InCombatLockdown
+local GetFrameLevel, SetFrameLevel, SetDrawLayer = GetFrameLevel, SetFrameLevel, SetDrawLayer
 
 local MAXFRAMES = T.general.maxFrames
 
@@ -67,12 +68,12 @@ function RBG:BuildFrame(name)
     frame.powerBar = RBG:BuildPowerBar(frame)
     frame.Name = RBG:BuildNameText(frame)
     frame.flag = RBG:BuildFlag(frame)
-    frame.highlight = RBG:BuildHighlight(frame)
     frame.leftBox.Rank = RBG:BuildRank(frame)
     frame.leftBox.Class = RBG:BuildClassIcon(frame)
     --frame.rightBox.Trinket = RBG:BuildTrinketIcon(frame)
     --frame.rightBox.Skull = RBG:BuildSkullIcon(frame)
     --frame.TargetCount = RBG:BuildTargetCount(frame)
+    frame.highlight = RBG:BuildHighlight(frame)
     frame:SetAttribute("type1","macro")
     frame:SetAttribute("type2","macro")
     frame:SetAttribute("macrotext1","")
@@ -111,6 +112,8 @@ local function GenerateTestInfo(num)
         tinsert(RBG.testenemies,enemy)
     end
     RBG.testenemies[rand(1,min(num,MAXFRAMES))].flag = true
+    RBG.testenemies[rand(1,min(num,MAXFRAMES))].fapTime = 9999999999
+    RBG.testenemies[rand(1,min(num,MAXFRAMES))].freedomTime = 9999999999
 end
 
 function RBG:Hide()                         -- todo stop updates
@@ -172,7 +175,6 @@ local function Compare(a, b, level)
     if a[sortOrder[level]] == b[sortOrder[level]] and level < #sortOrder then
         return Compare(a, b, level+1)
     elseif sortOrder[level]=="class" then
-        R:Print("classes: ", a.class, b.class)
         return T.SortOrder[a.class] < T.SortOrder[b.class]
     elseif sortOrder[level]=="rank" then
         return a.rank >= b.rank
@@ -250,10 +252,10 @@ function RBG:UpdateStatic(frame)
     --print(frame:GetName())
     frame:SetSize(R:Round(RBG.db.frameWidth,R.pix), R:Round(RBG.db.frameHeight,R.pix))
     for _,element in ipairs(frame.elements) do
+        element:UpdateBorder()
         element:updateStatic(frame)
         if element:IsActive() and element:GetParent():IsActive() then 
             element:Show() 
-            print(element:GetName()," displayed")
         end
     end
 end
@@ -263,7 +265,7 @@ function RBG:UpdateAllStatic()
     if RBG.db.showHeader and not RBG.HeaderFrame:IsShown() then RBG.HeaderFrame:Show()
     elseif not RBG.db.showHeader and RBG.HeaderFrame:IsShown() then RBG.HeaderFrame:Hide() end
     RBG.UpdateBarTextures()
-    RBG:UpdateBorders()
+
     RBG.powerBarHeight = R:Round(RBG.db.frameHeight / 5, R.pix)
     for frame in pairs(RBG.activeFrames) do
         RBG:UpdateStatic(frame)
@@ -317,14 +319,14 @@ function RBG:AddBorder()
     --create border frames
     local borderFrames = {}
     
-    borderFrames.t = CreateFrame("Frame","DONG1",frame)
-    borderFrames.r = CreateFrame("Frame","DONG2",frame)
-    borderFrames.b = CreateFrame("Frame","DONG3",frame)  
-    borderFrames.l = CreateFrame("Frame","DONG4",frame) 
-    borderFrames.tl = CreateFrame("Frame","DONG5",frame) 
-    borderFrames.tr = CreateFrame("Frame","DONG6",frame) 
-    borderFrames.bl = CreateFrame("Frame","DONG7",frame) 
-    borderFrames.br = CreateFrame("Frame","DONG8",frame) 
+    borderFrames.t = CreateFrame("Frame",nil,frame)
+    borderFrames.r = CreateFrame("Frame",nil,frame)
+    borderFrames.b = CreateFrame("Frame",nil,frame)  
+    borderFrames.l = CreateFrame("Frame",nil,frame) 
+    borderFrames.tl = CreateFrame("Frame",nil,frame) 
+    borderFrames.tr = CreateFrame("Frame",nil,frame) 
+    borderFrames.bl = CreateFrame("Frame",nil,frame) 
+    borderFrames.br = CreateFrame("Frame",nil,frame) 
     --[[borderFrames.t:SetPoint("BOTTOMLEFT",frame,"TOPLEFT") borderFrames.t:SetPoint("BOTTOMRIGHT",frame,"TOPRIGHT")
     borderFrames.r:SetPoint("TOPLEFT",frame,"TOPRIGHT") borderFrames.r:SetPoint("BOTTOMLEFT",frame,"BOTTOMRIGHT") 
     borderFrames.b:SetPoint("TOPLEFT",frame,"BOTTOMLEFT") borderFrames.b:SetPoint("TOPRIGHT",frame,"BOTTOMRIGHT")
@@ -347,32 +349,27 @@ function RBG:AddBorder()
     borderFrames.b:SetPoint("TOPLEFT",borderFrames.bl,"TOPRIGHT")   borderFrames.b:SetPoint("BOTTOMRIGHT",borderFrames.br,"BOTTOMLEFT")
     borderFrames.l:SetPoint("TOPLEFT",borderFrames.tl,"BOTTOMLEFT") borderFrames.l:SetPoint("BOTTOMRIGHT",borderFrames.bl,"TOPRIGHT")
 
-    for _,b in pairs{borderFrames.tl, borderFrames.tr, borderFrames.bl, borderFrames.br} do 
+    for _,b in pairs({borderFrames.tl, borderFrames.tr, borderFrames.bl, borderFrames.br}) do 
         local dim = R:Round(RBG.db.borderWidth, R.pix)
         b:SetSize(dim,dim) 
     end
     
-    for _,bd in pairs(borderFrames) do bd.tex=bd:CreateTexture(nil,"BORDER") bd.tex:SetVertexColor(rgb(RBG.db.bdColor)) bd.tex:SetAllPoints() bd:Show() bd:SetFrameLevel(50)end
-
-    RBG.borders[borderFrames] = true
+    for f,bd in pairs(borderFrames) do bd.tex=bd:CreateTexture(nil,"BORDER") bd.tex:SetVertexColor(rgb(RBG.db.bdColor)) bd.tex:SetAllPoints() end
 
     frame.borders=borderFrames
 
 end
 
-function RBG:UpdateBorders()
-    for border in pairs(RBG.borders) do
-        RBG:UpdateBorder(border)
+function RBG:UpdateBorder(width, color, level)
+    R:Print(self:GetName() or "nil")
+    if color then R:Print(width, rgb(color)) end
+    local border, width, color, level = self.borders, R:Round(width,R.pix) or R:Round(RBG.db.borderWidth,R.pix), color or RBG.db.bdColor, level or "BORDER"
+    if not border then return end
+    R:Print(width, rgb(color))
+    for _,b in pairs({border.tl, border.tr, border.bl, border.br}) do 
+        b:SetSize(width, width) 
     end
-end
-
-function RBG:UpdateBorder(border, width, color, level)
-    local border, width, color, level = border or self.borders, R:Round(width,R.pix) or R:Round(RBG.db.borderWidth,R.pix), color or RBG.db.bdColor, level or 20
-    for _,b in pairs{border.tl, border.tr, border.bl, border.br} do 
-        local dim = R:Round(RBG.db.borderWidth, R.pix)
-        b:SetSize(dim,dim) 
-    end
-    for _,bd in pairs(border) do bd.tex:SetColorTexture(rgb(color)) bd.tex:SetAllPoints() bd:Show() bd:SetFrameLevel(level) end
+    for _,bd in pairs(border) do bd.tex:SetVertexColor(rgb(color)) bd.tex:SetColorTexture(rgb(color)) bd.tex:SetAllPoints() bd.tex:SetDrawLayer(level, 7) end
 end
 
 function RBG:OnInitialize()

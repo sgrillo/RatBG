@@ -33,7 +33,6 @@ function RBG:BuildContainers(frame)
 end
 
 function RBG:UpdateContainerStatic(frame)
-    print("Container Update: ", self:GetName(), ", ", frame:GetName())
     local width = 0
     self.active = false
     self:SetHeight(frame:GetHeight())
@@ -46,7 +45,6 @@ function RBG:UpdateContainerStatic(frame)
     end
 
     for _,element in ipairs(self.elements) do
-        R:Print("Container Update")
         element:updateStatic(frame)
         if element:IsActive() then
             self.attach = element
