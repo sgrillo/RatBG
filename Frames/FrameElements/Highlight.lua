@@ -17,8 +17,8 @@ function RBG:BuildHighlight(frame)
 
     tinsert(frame.elements, highlight)
     
-    RBG:RegisterUpdates(healthBar)
-    frame.hoverLayer:AddBorder()
+    RBG:RegisterUpdates(highlight)
+    highlight:AddBorder()
 end
 
 
