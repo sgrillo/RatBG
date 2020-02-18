@@ -2,7 +2,7 @@ local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
 local RBG = R.bgFrames
 
-local min,max = math.min, math.max
+local min,max, tinsert = math.min, math.max, tinsert
 
 function RBG:BuildFlag(frame)
     local flagIcon = CreateFrame("Frame", frame:GetName().."FlagIcon", frame)
@@ -19,7 +19,7 @@ function RBG:BuildFlag(frame)
     flagIcon.staticUpdate = RBG.UpdateFlagStatic
     flagIcon.dynamicUpdate = RBG.UpdateFlagDynamic
 
-    frame.elements[flagIcon] = true
+    tinsert(frame.elements, flagIcon)
 
     flagIcon.active = false
 

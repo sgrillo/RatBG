@@ -1,5 +1,7 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
+local tinsert = tinsert
+
 local RBG = R.bgFrames
 local LSM = R.Libs.LSM
 
@@ -16,7 +18,7 @@ function RBG:BuildNameText(frame)
 
     nameText.IsActive = function() return true end
 
-    frame.elements[nameText] = true
+    tinsert(frame.elements, nameText)
     RBG:RegisterUpdates(nameText)
 
     return nameText

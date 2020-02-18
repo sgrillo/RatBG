@@ -76,7 +76,7 @@ function Scanner:updateUnits(seen)
                 _, enemy.powerType = UnitPowerType(id)
                 enemy.maxPower = UnitPowerMax(id)
                 enemy.currentPower = UnitPower(id)
-                if enemy.class == "Druid" and enemy.powerType == "MANA" then
+                if enemy.class == "DRUID" and enemy.powerType == "MANA" then
                     enemy.maxMana = UnitPowerMax(id)
                     enemy.currentMana = UnitPower(id)
                 end

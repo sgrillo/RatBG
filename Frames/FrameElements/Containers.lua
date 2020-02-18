@@ -1,5 +1,7 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
+local tinsert = tinsert
+
 local RBG = R.bgFrames
 
 local function buildContainer(frame, side)
@@ -11,7 +13,7 @@ local function buildContainer(frame, side)
     container.side = side
     container.attach = container
     --register everything
-    frame.elements[container] = true
+    tinsert(frame.elements, container)
 
     container.staticUpdate = RBG.UpdateContainerStatic
     container.dynamicUpdate = RBG.UpdateContainerDynamic
@@ -24,21 +26,30 @@ local function buildContainer(frame, side)
 end
 
 function RBG:BuildContainers(frame)
-    local leftBox = buildContainer(frame, "Left")
-    local rightBox = buildContainer(frame, "Right")
+    local leftBox = buildContainer(frame, "LEFT")
+    local rightBox = buildContainer(frame, "RIGHT")
 
     return leftBox, rightBox
 end
 
 function RBG:UpdateContainerStatic(frame)
-    --print("Container Update: ", self:GetName(), ", ", frame:GetName())
+    print("Container Update: ", self:GetName(), ", ", frame:GetName())
     local width = 0
-    local active = frame.active
     self.active = false
+    self:SetHeight(frame:GetHeight())
+    self.attach = self
+
+    if self.side == "LEFT" then
+        self:SetPoint("TOPLEFT",frame,"TOPLEFT")
+    else
+        self:SetPoint("TOPRIGHT",frame,"TOPRIGHT")
+    end
+
     for _,element in ipairs(self.elements) do
+        R:Print("Container Update")
         element:updateStatic(frame)
         if element:IsActive() then
-            container.attach = element
+            self.attach = element
             if frame:IsActive() then 
                 self:Show() 
                 element:Show()
@@ -49,19 +60,13 @@ function RBG:UpdateContainerStatic(frame)
     end
     if self.active then
         self:SetWidth(width)
-
-        if self.side == "Left" then
-            self:SetPoint("TOPLEFT",frame,"TOPLEFT")
-            self:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT")
-        else
-            self:SetPoint("TOPRIGHT",frame,"TOPRIGHT")
-            self:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT")
-        end
+    else
+        self:Hide()
     end
 end
 
 function RBG:UpdateContainerDynamic(frame)
-    for element, dynamicUpdateFunction in pairs(frame.dynamicUpdates) do
-        dynamicUpdateFunction(frame)
+    for _,element in ipairs(self.elements) do
+        element:updateDynamic(frame)
     end
 end

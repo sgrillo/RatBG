@@ -67,13 +67,11 @@ function RBG:BuildFrame(name)
     frame.powerBar = RBG:BuildPowerBar(frame)
     frame.Name = RBG:BuildNameText(frame)
     frame.flag = RBG:BuildFlag(frame)
-    --frame.leftBox.Rank = RBG:BuildRank(frame)
-    --frame.leftBox.Class = RBG:BuildClassIcon(frame)
+    frame.leftBox.Rank = RBG:BuildRank(frame)
+    frame.leftBox.Class = RBG:BuildClassIcon(frame)
     --frame.rightBox.Trinket = RBG:BuildTrinketIcon(frame)
     --frame.rightBox.Skull = RBG:BuildSkullIcon(frame)
     --frame.TargetCount = RBG:BuildTargetCount(frame)
-    
-
     frame:SetAttribute("type1","macro")
     frame:SetAttribute("type2","macro")
     frame:SetAttribute("macrotext1","")
@@ -180,6 +178,7 @@ local function Compare(a, b, level)
     if a[sortOrder[level]] == b[sortOrder[level]] and level < #sortOrder then
         return Compare(a, b, level+1)
     elseif sortOrder[level]=="class" then
+        R:Print("classes: ", a.class, b.class)
         return T.SortOrder[a.class] < T.SortOrder[b.class]
     elseif sortOrder[level]=="rank" then
         return a.rank >= b.rank
@@ -256,11 +255,11 @@ end
 function RBG:UpdateStatic(frame)
     --print(frame:GetName())
     frame:SetSize(R:Round(RBG.db.frameWidth,R.pix), R:Round(RBG.db.frameHeight,R.pix))
-    for element in pairs(frame.elements) do
+    for _,element in ipairs(frame.elements) do
         element:updateStatic(frame)
         if element:IsActive() and element:GetParent():IsActive() then 
             element:Show() 
-            --print(element:GetName()," displayed")
+            print(element:GetName()," displayed")
         end
     end
 end

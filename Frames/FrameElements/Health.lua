@@ -3,7 +3,7 @@ local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 local RBG = R.bgFrames
 local LSM = R.Libs.LSM
 
-local rand = math.random
+local rand, tinsert = math.random, tinsert
 
 function RBG:BuildHealthBar(frame)
     local healthBar = CreateFrame("StatusBar", frame:GetName().."HealthBar", frame)
@@ -24,7 +24,7 @@ function RBG:BuildHealthBar(frame)
     healthBar:SetSmoothing(true)
 
     self.statusbars[healthBar] = true
-    frame.elements[healthBar] = true
+    tinsert(frame.elements, healthBar)
 
     healthBar.IsActive = function() return true end
 
@@ -68,14 +68,14 @@ function RBG:UpdateHealthStatic(frame)
 
     if leftBox:IsActive() then
         --print("left box anchor")
-        self:SetPoint("TOPLEFT",leftBox,"TOPRIGHT")
+        self:SetPoint("TOPLEFT",leftBox,"TOPRIGHT",-R:Round(border, R.pix),0)
     else
         --print("left frame anchor")
         self:SetPoint("TOPLEFT",frame,"TOPLEFT")
     end
     if rightBox:IsActive() then
         --print("right box anchor")
-        self:SetPoint("BOTTOMRIGHT",rightBox,"BOTTOMLEFT",0,bottomHeight)
+        self:SetPoint("BOTTOMRIGHT",rightBox,"BOTTOMLEFT",R:Round(border, R.pix),bottomHeight)
     else
         --print("right frame anchor")
         self:SetPoint("BOTTOMRIGHT",frame,"BOTTOMRIGHT",0,bottomHeight)

@@ -233,7 +233,7 @@ local function BumpFrame(self)
 	R.db.locations[self:GetName()] = {xPos, yPos}
 
 	self:ClearAllPoints()
-	--self:SetPoint("TOPLEFT",R.UIParent,"BOTTOMLEFT", xPos, yPos)			--I don't actually think this is needed as long as I scale everything so it lines up
+	self:SetPoint("TOPLEFT",R.UIParent,"BOTTOMLEFT", xPos, yPos)			--I don't actually think this is needed as long as I scale everything so it lines up
 																			-- keeping it for now just in case
 end
 

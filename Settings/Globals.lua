@@ -27,19 +27,19 @@ T.general = {
 	},
 	powerTypes = {
 		Mana = {
-			Mage = true,
-			Priest = true,
-			Warlock = true,
-			Hunter = true,
-			Shaman = true,
-			Paladin = true,
-			Druid = true,
+			MAGE = true,
+			PRIEST = true,
+			WARLOCK = true,
+			HUNTER = true,
+			SHAMAN = true,
+			PALADIN = true,
+			DRUID = true,
 		},
 		Energy = {
-			Rogue = true
+			ROGUE = true
 		},
 		Rage = {
-			Warrior = true
+			WARRIOR = true
 		}
 	}
 }
@@ -54,13 +54,13 @@ T.RatBlue = {
 
 --Table is kind of "backwards" to look up values quick
 T.SortOrder = {
-	Mage = 5,
-	Priest = 1,
-	Warlock = 6,
-	Hunter = 7,
-	Shaman = 3,
-	Paladin = 2,
-	Druid = 4,
-	Rogue = 9,
-	Warrior = 0
+	MAGE = 5,
+	PRIEST = 1,
+	WARLOCK = 6,
+	HUNTER = 7,
+	SHAMAN = 3,
+	PALADIN = 2,
+	DRUID = 4,
+	ROGUE = 9,
+	WARRIOR = 0
 }

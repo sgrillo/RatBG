@@ -1,6 +1,6 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
-local strupper, rand = strupper, math.random
+local strupper, rand, tinsert = strupper, math.random, tinsert
 
 local RBG = R.bgFrames
 local LSM = R.Libs.LSM
@@ -26,7 +26,7 @@ function RBG:BuildPowerBar(frame)
     powerBar:SetSmoothing(true)
 
     self.statusbars[powerBar] = true
-    frame.elements[powerBar] = true
+    tinsert(frame.elements, powerBar)
 
     powerBar.active = false
 
@@ -43,7 +43,7 @@ local function LookupPowerType(enemy)
     if enemy.class then
         local powerTypes, class = T.general.powerTypes, enemy.class
         --handle druids because they're silly
-        if class == "Druid" then
+        if class == "DRUID" then
             return RBG.db.trackPower == "All" and enemy.powerType or "Mana"
         end
         return powerTypes.Mana[class] and "Mana" or powerTypes.Energy[class] and "Energy" or powerTypes.Rage[class] and "Rage"
@@ -55,7 +55,7 @@ function RBG:UpdatePowerDynamic(frame)
     if RBG.testMode then return end
     if not frame.enemy then self:SetValue(1) return end
     local power, maxPower = frame.enemy.currentPower, frame.enemy.maxPower
-    if frame.enemy.class == "Druid" then     --need to check if we need to change bar color
+    if frame.enemy.class == "DRUID" then     --need to check if we need to change bar color
         if RBG.db.trackPower == "All" then
             local type = frame.enemy.powerType or "Mana"
             self:SetStatusBarColor(rgb(T.general.powerColors[strupper(type)]))
@@ -81,14 +81,14 @@ function RBG:UpdatePowerStatic(frame)
 
     if leftBox:IsActive() then
         --print("left box anchor")
-        self:SetPoint("BOTTOMLEFT",leftBox,"BOTTOMRIGHT")
+        self:SetPoint("BOTTOMLEFT",leftBox,"BOTTOMRIGHT",-R:Round(border, R.pix),0)
     else
         --print("left frame anchor")
         self:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT")
     end
     if rightBox:IsActive() then
         --print("right box anchor")
-        self:SetPoint("TOPRIGHT",rightBox,"BOTTOMLEFT",0,bottomHeight)
+        self:SetPoint("TOPRIGHT",rightBox,"BOTTOMLEFT",R:Round(border, R.pix),bottomHeight)
     else
         --print("right frame anchor")
         self:SetPoint("TOPRIGHT",frame,"BOTTOMRIGHT",0,bottomHeight)
@@ -96,7 +96,7 @@ function RBG:UpdatePowerStatic(frame)
     
 
     --Handle powerBar Display Settings
-    local type, enemy = "Mana", RBG.testMode and frame.testenemy or frame.enemy
+    local type, enemy = "Mana", frame:GetEnemy()
     if enemy then
         type = LookupPowerType(enemy) or type
     end

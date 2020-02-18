@@ -9,7 +9,7 @@ local names = {"Graphima","Pixstewart","Harrigrin","Parbroom","Wepower","Harilda
 local servers = {"Anathema","Bigglesworth","Benediction","Blaumeux","Faerlina","Fairbanks","Herrod","Incendius","Kirtonos","Kurinaxx","Kromcrush","Netherwind","Rattlegore","Skeram","Smolderweb","Stalagg","Sulfuras","Thalnos","Thunderfury","Whitemane"}
 local forceWarlock,forcePriest,forceDruid,forcePaladin,forceHunter = {Juised=true},{Egg=true, Dip=true, Dirt=true, Dink=true},{Stnu=true,Drexxor=true},{Anticipating=true,Andy=true},{Dorc=true}
 forceWarlock[Rat] = true
-local classes = {"Warrior","Paladin","Hunter","Rogue","Priest","Shaman","Mage","Warlock","Druid"}
+local classes = {"WARRIOR","PALADIN","HUNTER","ROGUE","PRIEST","SHAMAN","MAGE","WARLOCK","DRUID"}
 local powerTypes = {"Mana","Energy","Rage"}
 
 --make some full names
@@ -38,7 +38,7 @@ function RBG:GenerateEnemy()
     fullnames[rname] = nil
     tremove(shortnames, ndx)
     R:Print(rname, rfullname)
-    local rclass = forceWarlock[rname] and "Warlock" or forcePriest[rname] and "Priest" or forceDruid[rname] and "Druid" or forcePaladin[rname] and "Paladin" or forceHunter[rname] and "Hunter" or classes[rand(1,#classes)]
+    local rclass = forceWarlock[rname] and "WARLOCK" or forcePriest[rname] and "PRIEST" or forceDruid[rname] and "DRUID" or forcePaladin[rname] and "PALADIN" or forceHunter[rname] and "HUNTER" or classes[rand(1,#classes)]
     local enemy = 
     {
         name = rname,
