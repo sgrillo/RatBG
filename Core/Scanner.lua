@@ -39,6 +39,11 @@ end
 
 
 function Scanner:search()
+    if GetServerTime() > scoreTimer then
+        scoreTimer = GetServerTime() + (#RBG.enemies == BGSize[Scanner.zone] and 30 or 1)           --only check every 30s if the bg is full, incase someone leaves
+        RequestBattlefieldScoreData()
+    end
+
     if GetTime() < updateTimer then return end
 
     updateTimer = GetTime() + R.db.scanner.updateFreq
@@ -107,11 +112,8 @@ function Scanner:UPDATE_BATTLEFIELD_SCORE()
         return
     end
 
-    if GetServerTime() < scoreTimer then return end
-
     local found, exists = false, {} 
 
-    scoreTimer = GetServerTime() + (#RBG.enemies == BGSize[Scanner.zone] and 30 or 3)           --only check every 30s if the bg is full, incase someone leaves
 
     for _,enemy in pairs(RBG.enemies) do
         exists[enemy.fullname] = true
