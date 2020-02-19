@@ -170,6 +170,22 @@ R.Options.args.BattlegroundBars = {
 					min = 0, max = 10, step = 1,
 					get = function() return tonumber(R.db.bgFrames.borderWidth) end
 				},
+				trackPower = {
+					order = 11,
+					type = "select",
+					name = "Power Bar",
+					desc = "Dynamically update power bars on the enemy. Can optionally choose to only show mana.",
+					values = { ["All"] = "All", ["Mana"] = "Mana Only", ["None"] = "None" }
+				},
+				powerBarPercent = {
+					order = 12,
+					type = "range",
+					name = "Power Bar Height",
+					desc = "Varies the height of the power bar frame relative to the overall frame",
+					isPercent = true,
+					min=.1, max=.90, step = .01,
+					get = function(info) return tonumber(R.db.bgFrames[info[#info]]) end
+				}
 			}
 		},
 		fontGroup = {
@@ -293,13 +309,6 @@ R.Options.args.BattlegroundBars = {
 					name = "Target Count",
 					desc = "Shows how many members of your team are currently targetting the player",
 					type = "toggle"
-				},
-				trackPower = {
-					order = 4,
-					type = "select",
-					name = "Power Bar",
-					desc = "Dynamically update power bars on the enemy. Can optionally choose to only show mana.",
-					values = { ["All"] = "All", ["Mana"] = "Mana Only", ["None"] = "None" }
 				},
 				freedomHighlight = {
 					order = 5,

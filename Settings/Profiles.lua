@@ -50,6 +50,7 @@ A.bgFrames = {
 	trackHealth = true,
 	rangeFade = true,
 	trackPower = "All",
+	powerBarPercent = 0.2,
 	freedomHighlight = true,
 	fapHighlight = true,
 	targetCount = false,

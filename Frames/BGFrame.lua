@@ -266,7 +266,7 @@ function RBG:UpdateAllStatic()
     elseif not RBG.db.showHeader and RBG.HeaderFrame:IsShown() then RBG.HeaderFrame:Hide() end
     RBG.UpdateBarTextures()
 
-    RBG.powerBarHeight = R:Round(RBG.db.frameHeight / 5, R.pix)
+    RBG.powerBarHeight = R:Round(RBG.db.frameHeight * RBG.db.powerBarPercent, R.pix)
     for frame in pairs(RBG.activeFrames) do
         RBG:UpdateStatic(frame)
         frame:Show() 
@@ -375,7 +375,7 @@ end
 function RBG:OnInitialize()
     self.db = R.db.bgFrames
     self.statusbars = R.statusbars
-    self.powerBarHeight = R:Round(self.db.frameHeight / 5, R.pix)
+    self.powerBarHeight = R:Round(self.db.frameHeight * self.db.powerBarPercent, R.pix)
 
     self.HeaderFrame = RBG:BuildHeader()
     --self.HeaderFrame:Show()
