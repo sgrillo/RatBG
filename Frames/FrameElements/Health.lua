@@ -42,8 +42,6 @@ function RBG:BuildHealthBar(frame)
         healthBar:SetStatusBarColor(c.r, c.g, c.b, c.a)
     end
 
-    healthBar:SetScript("OnEnter", function() healthBar.colorMult = 1.15 healthBar:HealthBarColor() end)
-    healthBar:SetScript("OnLeave", function() healthBar.colorMult = 1.0 healthBar:HealthBarColor() end)
     return healthBar
 end
 

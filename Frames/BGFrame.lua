@@ -78,7 +78,9 @@ function RBG:BuildFrame(name)
     frame:SetAttribute("type2","macro")
     frame:SetAttribute("macrotext1","")
     frame:SetAttribute("macrotext2","")
-    --frame:RegisterForClicks("AnyDown")
+
+    frame:SetScript("OnEnter", function() frame.healthBar.colorMult = 1.15 frame.healthBar:HealthBarColor() end)
+    frame:SetScript("OnLeave", function() frame.healthBar.colorMult = 1.0 frame.healthBar:HealthBarColor() end)
 
     frame.init = false
     frame.active = false
@@ -361,11 +363,9 @@ function RBG:AddBorder()
 end
 
 function RBG:UpdateBorder(width, color, level)
-    R:Print(self:GetName() or "nil")
     if color then R:Print(width, rgb(color)) end
     local border, width, color, level = self.borders, R:Round(width,R.pix) or R:Round(RBG.db.borderWidth,R.pix), color or RBG.db.bdColor, level or "BORDER"
     if not border then return end
-    R:Print(width, rgb(color))
     for _,b in pairs({border.tl, border.tr, border.bl, border.br}) do 
         b:SetSize(width, width) 
     end
