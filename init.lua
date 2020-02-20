@@ -18,7 +18,7 @@ local CallbackHandler = _G.LibStub("CallbackHandler-1.0")
 
 local AddonName, Engine = ...
 
-local Addon = AceAddon:NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", 'AceHook-3.0')
+local Addon = AceAddon:NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", 'AceHook-3.0', "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or CallbackHandler:New(Addon)
 Addon.Options = {type = "group", name = AddonName, args = {}}
 Addon.DB = {profile = {}, global = {}} -- Defaults

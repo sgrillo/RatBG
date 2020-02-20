@@ -5,7 +5,7 @@ local RBG, Scanner = R.bgFrames, R.scanner
 --lua functions
 local strmatch, strupper = strmatch, strupper
 --Wow API
-local InCombatLockdown, GetServerTime, GetTime = InCombatLockdown, GetServerTime, GetTime
+local InCombatLockdown, GetServerTime, GetTime, GetSpellInfo = InCombatLockdown, GetServerTime, GetTime, GetSpellInfo
 
 Scanner.frame = CreateFrame("Frame")
 
@@ -26,6 +26,7 @@ function Scanner:CheckZone()
         Scanner:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         if RBG.testMode then RBG:TestToggle() end
     else
+        R:CancelAllTimers()
         RBG:Clear()
         scanner:SetScript("OnUpdate", nil)
         Scanner:UnregisterEvent("UPDATE_BATTLEFIELD_SCORE")
@@ -39,7 +40,31 @@ function Scanner:CheckZone()
 end
 
 function Scanner:COMBAT_LOG_EVENT_UNFILTERED()
-    
+    local timestamp, event, _, _, srcName, srcFlags, _, _, destName, destFlags, _, spellID, spellName = CombatLogGetCurrentEventInfo()
+    local strFAP = GetSpellInfo(6615)
+    local strFreedom = GetSpellInfo(1044)
+
+    if bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then              --enemy is the destination, used for buff/debuff tracking
+        if event == "SPELL_AURA_APPLIED" and (spellName == strFAP) then
+            local frame = RBG.frameNames[destName]
+            if frame and frame.enemy then
+                frame.enemy.fapTime = timestamp + 30
+                RBG.pendingUpdate[frame] = true
+                frame.timer = R:ScheduleTimer(function() 
+                    RBG.pendingUpdate[frame] = true
+                    RBG:UpdateDynamic(frame) end, 30)
+            end
+        end
+        if event == "SPELL_AURA_REMOVED" and (spellName == strFAP) then
+            local frame = RBG.frameNames[destName]
+            if frame and frame.enemy then
+                frame.enemy.fapTime = 0
+                RBG.pendingUpdate[frame] = true
+                if frame.timer then R:CancelTimer(frame.timer) end
+            end
+        end
+    end
+
 end
 
 function Scanner:search()
