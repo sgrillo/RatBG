@@ -24,7 +24,6 @@ RBG.testenemies = {}
 
 RBG.testMode = false
 
-
 ------Create Frames-------
 
 function RBG:BuildHeader()
@@ -130,11 +129,13 @@ function RBG:Show()                         -- todo stop updates
 end
 
 function RBG:Lock()
+    RBG.locked = true
     RBG.HeaderFrame:lock()
     if not RBG.db.showHeader then RBG.HeaderFrame:Hide() end
 end
 
 function RBG:Unlock()
+    RBG.locked = false
     RBG.HeaderFrame:Show()
     RBG.HeaderFrame:unlock()
 end
@@ -264,8 +265,8 @@ end
 
 function RBG:UpdateAllStatic()
     RBG.HeaderFrame:SetSize(R:Round(RBG.db.frameWidth,R.pix), R:Round(RBG.db.frameHeight,R.pix))
-    if RBG.db.showHeader and not RBG.HeaderFrame:IsShown() then RBG.HeaderFrame:Show()
-    elseif not RBG.db.showHeader and RBG.HeaderFrame:IsShown() then RBG.HeaderFrame:Hide() end
+    if (RBG.db.showHeader or not RBG.locked) and not RBG.HeaderFrame:IsShown() then RBG.HeaderFrame:Show()
+    elseif not RBG.db.showHeader and RBG.HeaderFrame:IsShown() and RBG.locked then RBG.HeaderFrame:Hide() end
     RBG.UpdateBarTextures()
 
     RBG.powerBarHeight = R:Round(RBG.db.frameHeight * RBG.db.powerBarPercent, R.pix)
@@ -392,6 +393,8 @@ function RBG:OnInitialize()
     ---DEBUG fill frames with dummy data---
     self:AssignEnemies()
     self:UpdateAllStatic()
+
+    self.locked = true
     
 end
 

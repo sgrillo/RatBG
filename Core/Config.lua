@@ -22,7 +22,32 @@ R.Options.args = {
 		type = "header",
 		name = "Version" .. format(": %s%s|r", T.RatBlue.displayText, T.general.version),
 		width = "full"
-	}
+	},
+	--[[ blankLine = {
+		order = 9,
+		type = "description",
+		width = full,
+		name = " "
+	},
+	testFramesButton = {
+		order = 10,
+		type = "execute",
+		name = "Test Frames",
+		func = function() RBG:TestToggle() end,
+		desc = nil
+	},
+	showHideButton = {
+		order = 11,
+		type = "execute",
+		name = "Lock/Unlock",
+		func = function() 
+			if RBG.locked then RBG:Unlock() 
+			else RBG:Lock()
+			end
+		end,
+		desc = nil
+	} ]]
+	
 }
 
 R.Options.args.BattlegroundBars = {
@@ -370,6 +395,30 @@ R.Options.args.BattlegroundBars = {
 					set = function(info, value) R.db.scanner[info[#info]] = value end
 				}
 			}
+		},
+		blankLine = {
+			order = 9,
+			type = "description",
+			width = full,
+			name = " "
+		},
+		testFramesButton = {
+			order = 10,
+			type = "execute",
+			name = "Test Frames",
+			func = function() RBG:TestToggle() end,
+			desc = nil
+		},
+		showHideButton = {
+			order = 11,
+			type = "execute",
+			name = "Lock/Unlock",
+			func = function() 
+				if RBG.locked then RBG:Unlock() 
+				else RBG:Lock()
+				end
+			end,
+			desc = nil
 		}
 	}
 }
