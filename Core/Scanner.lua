@@ -39,14 +39,24 @@ function Scanner:CheckZone()
 
 end
 
+local function GuessAlive(frame)
+    local enemy = frame and frame.enemy
+    if enemy and enemy.currentHealth == 0 then                    --if they cast something, then they're clearly not dead so speculatively set health/power to full
+        enemy.currentHealth = enemy.maxHealth           --until receive a real update
+        enemy.currentPower = enemy.maxPower
+        enemy.currentMana = enemy.maxMana
+        RBG.pendingUpdate[frame] = true 
+    end
+end
+
 function Scanner:COMBAT_LOG_EVENT_UNFILTERED()
     local timestamp, event, _, _, srcName, srcFlags, _, _, destName, destFlags, _, spellID, spellName = CombatLogGetCurrentEventInfo()
     local strFAP = GetSpellInfo(6615)
     local strFreedom = GetSpellInfo(1044)
 
     if bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then              --enemy is the destination, used for buff/debuff tracking
+        local frame = RBG.frameNames[destName]
         if event == "SPELL_AURA_APPLIED" and (spellName == strFAP) then
-            local frame = RBG.frameNames[destName]
             if frame and frame.enemy then
                 frame.enemy.fapTime = timestamp + 30
                 RBG.pendingUpdate[frame] = true
@@ -56,7 +66,6 @@ function Scanner:COMBAT_LOG_EVENT_UNFILTERED()
             end
         end
         if event == "SPELL_AURA_REMOVED" and (spellName == strFAP) then
-            local frame = RBG.frameNames[destName]
             if frame and frame.enemy then
                 frame.enemy.fapTime = 0
                 RBG.pendingUpdate[frame] = true
@@ -64,7 +73,12 @@ function Scanner:COMBAT_LOG_EVENT_UNFILTERED()
             end
         end
     end
-
+    if bit.band(srcFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then              --enemy is the source, used for sanity tracking
+        local frame = RBG.frameNames[srcName]
+        if event == "SPELL_CAST_SUCCESS" and frame then
+            GuessAlive(frame)
+        end   
+    end        
 end
 
 function Scanner:search()
@@ -213,6 +227,7 @@ function Scanner:FlagMessage(event, ...)
             frame.enemy.flag = true 
             RBG.pendingUpdate[frame] = true
         end
+        GuessAlive(frame)
     end
 end
 
