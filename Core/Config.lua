@@ -1,13 +1,13 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
 ---lua functions---
-tsort = table.sort
+local tsort = table.sort
 
 R.Libs.AceConfig:RegisterOptionsTable(R.AddonName, R.Options)
 R.Libs.AceConfigDialog:SetDefaultSize(R.AddonName, R:GetConfigDefaultSize())
 
 local RBG = R.bgFrames
-math_min = math.min
+local math_min = math.min
 
 R.Options.childGroups = "tab"
 
