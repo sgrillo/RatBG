@@ -216,7 +216,6 @@ end
 function R:HookElvUISkins()
 	if _G.ElvUI then
 		self:RawHook(ACG, "Create",  "styleVarSliderBar")
-		for k,v in pairs(R.hooks[ACG]) do print(k,v) end
 	end
 end
 
