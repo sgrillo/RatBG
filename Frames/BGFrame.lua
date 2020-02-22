@@ -10,6 +10,7 @@ local CreateFrame = CreateFrame
 local GetInstanceInfo = GetInstanceInfo
 local InCombatLockdown = InCombatLockdown
 local GetFrameLevel, SetFrameLevel, SetDrawLayer = GetFrameLevel, SetFrameLevel, SetDrawLayer
+local time = GetServerTime
 
 local MAXFRAMES = T.general.maxFrames
 
@@ -51,6 +52,14 @@ function RBG:BuildHeader()
 
 end
 
+function RBG.fade(frame, lvl)
+    if frame then
+        frame.healthBar:SetAlpha(lvl)
+        frame.powerBar:SetAlpha(lvl)
+        frame.highlight:SetAlpha(lvl)
+    end
+end
+
 function RBG:BuildFrame(name)
     local frame = CreateFrame("Button", name, UIParent, "SecureActionButtonTemplate")
     tinsert(RBG.frames, frame)
@@ -60,6 +69,7 @@ function RBG:BuildFrame(name)
     frame.elements = {}
     frame.staticUpdates = {}
     frame.dynamicUpdates = {}
+    frame.rangeTime = 0
 
     frame.leftBox, frame.rightBox = RBG:BuildContainers(frame)
 
@@ -202,7 +212,7 @@ function RBG:AssignEnemies(num)
         RBG.frameNames[e.fullname] = f
     end
 
-    RBG:ActivateFrames(num or #RBG[table])
+    RBG:ActivateFrames(tonumber(num) or #RBG[table])
     RBG:UpdateAll()
 
 end
@@ -252,7 +262,6 @@ function RBG:UpdateAll()
 end
 
 function RBG:UpdateStatic(frame)
-    --print(frame:GetName())
     frame:SetSize(R:Round(RBG.db.frameWidth,R.pix), R:Round(RBG.db.frameHeight,R.pix))
     for _,element in ipairs(frame.elements) do
         element:UpdateBorder()
@@ -261,6 +270,10 @@ function RBG:UpdateStatic(frame)
             element:Show() 
         end
     end
+    --range fade stuff for test mode
+    frame.rangeTime = RBG.testMode and rand(time()-1000, time()+1000) or frame.rangeTime
+
+    RBG.fade(frame, RBG.db.rangeFade and ((time() < frame.rangeTime) and 1 or 0.4) or 1)
 end
 
 function RBG:UpdateAllStatic()
@@ -277,6 +290,7 @@ function RBG:UpdateAllStatic()
 end
 
 function RBG:UpdateDynamic(frame)
+    if RBG.db.rangeFade then RBG.fade(frame, (time() < frame.rangeTime) and 1 or 0.4) end
     if RBG.pendingUpdate[frame] then
         for _,element in ipairs(frame.elements) do
             element:updateDynamic(frame)
@@ -364,7 +378,6 @@ function RBG:AddBorder()
 end
 
 function RBG:UpdateBorder(width, color, level)
-    if color then R:Print(width, rgb(color)) end
     local border, width, color, level = self.borders, R:Round(width,R.pix) or R:Round(RBG.db.borderWidth,R.pix), color or RBG.db.bdColor, level or "BORDER"
     if not border then return end
     for _,b in pairs({border.tl, border.tr, border.bl, border.br}) do 

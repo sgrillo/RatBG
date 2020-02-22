@@ -1,6 +1,6 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
-local RBG, Scanner = R.bgFrames, R.scanner
+local RBG, Scanner, fadetime = R.bgFrames, R.scanner, T.general.rangeFadeTime
 
 --lua functions
 local strmatch, strupper = strmatch, strupper
@@ -56,27 +56,31 @@ function Scanner:COMBAT_LOG_EVENT_UNFILTERED()
 
     if bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then              --enemy is the destination, used for buff/debuff tracking
         local frame = RBG.frameNames[destName]
-        if event == "SPELL_AURA_APPLIED" and (spellName == strFAP) then
-            if frame and frame.enemy then
-                frame.enemy.fapTime = timestamp + 30
-                RBG.pendingUpdate[frame] = true
-                frame.timer = R:ScheduleTimer(function() 
+        if frame then
+            frame.rangeTime = timestamp + fadetime 
+            if event == "SPELL_AURA_APPLIED" and (spellName == strFAP) then
+                if frame.enemy then
+                    frame.enemy.fapTime = timestamp + 30
                     RBG.pendingUpdate[frame] = true
-                    RBG:UpdateDynamic(frame) end, 30)
+                    frame.fapTimer = R:ScheduleTimer(function() 
+                        RBG.pendingUpdate[frame] = true
+                        RBG:UpdateDynamic(frame) end, 30)
+                end
             end
-        end
-        if event == "SPELL_AURA_REMOVED" and (spellName == strFAP) then
-            if frame and frame.enemy then
-                frame.enemy.fapTime = 0
-                RBG.pendingUpdate[frame] = true
-                if frame.timer then R:CancelTimer(frame.timer) end
+            if event == "SPELL_AURA_REMOVED" and (spellName == strFAP) then
+                if frame.enemy then
+                    frame.enemy.fapTime = 0
+                    RBG.pendingUpdate[frame] = true
+                    if frame.fapTimer then R:CancelTimer(frame.timer) end
+                end
             end
         end
     end
     if bit.band(srcFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then              --enemy is the source, used for sanity tracking
         local frame = RBG.frameNames[srcName]
-        if event == "SPELL_CAST_SUCCESS" and frame then
+        if frame and (strmatch(event, "SPELL_CAST") or strmatch(event, "SWING")) then
             GuessAlive(frame)
+            frame.rangeTime = timestamp + fadetime
         end   
     end        
 end
@@ -116,6 +120,7 @@ function Scanner:updateUnits(seen)
     for name,id in pairs(seen) do
         local frame = RBG.frameNames[name]
         if frame then
+            frame.rangeTime = GetServerTime() + fadetime
             local enemy = RBG.frameNames[name].enemy
             if enemy then
                 --print("found enemy: "..name) 
