@@ -41,7 +41,8 @@ T.general = {
 		Rage = {
 			WARRIOR = true
 		}
-	}
+	},
+	rangeFadeTime = 10
 }
 
 T.RatBlue = {
