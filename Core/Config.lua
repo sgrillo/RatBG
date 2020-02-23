@@ -188,13 +188,13 @@ R.Options.args.BattlegroundBars = {
 						RBG:UpdateAllStatic()
 					end
 				},
-				borderWidth = {
+				--[[ borderWidth = {
 					order = 10,
 					type = "range",
 					name = "Border Width",
-					min = 0, max = 10, step = 1,
+					min = 1, max = 10, step = 1,
 					get = function() return tonumber(R.db.bgFrames.borderWidth) end
-				},
+				}, ]]
 				trackPower = {
 					order = 11,
 					type = "select",
