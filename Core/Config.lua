@@ -299,13 +299,15 @@ R.Options.args.BattlegroundBars = {
 				trinketIcon = {
 					order = 3,
 					name = "Trinket Icon",
-					type = "toggle"
+					type = "toggle",
+					disabled = true
 				},
 				skullIcon = {
 					order = 4,
 					type = "toggle",
 					name = "Skull Icon",
-					desc = "Shows when a player is affected by the Skull of Impending Doom and tracks the cooldown"
+					desc = "Shows when a player is affected by the Skull of Impending Doom and tracks the cooldown",
+					disabled = true
 				}
 			}
 		},
@@ -327,13 +329,14 @@ R.Options.args.BattlegroundBars = {
 					order = 2,
 					type = "toggle",
 					name = "Range Fade",
-					desc = "Fade the bar when the enemy is out of range.\nFade range is at least 30 yards for all classes"
+					desc = "Fades the bar when enemies are out of targetable range. (WORK IN PROGRESS, BLIZZARD MAKES THIS REALLY HARD)"
 				},
 				targetCount = {
 					order = 9,
 					name = "Target Count",
 					desc = "Shows how many members of your team are currently targetting the player",
-					type = "toggle"
+					type = "toggle",
+					disabled = true
 				},
 				freedomHighlight = {
 					order = 5,
@@ -429,6 +432,7 @@ R.Options.args.BGFocus = {
 	name = "BG Focus Frame",
 	childGroups = "tab",
 	width = "full",
+	disabled = true,
 	args = {
 	}
 }
