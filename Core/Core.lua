@@ -224,10 +224,8 @@ local function BumpFrame(self)
 	self:StopMovingOrSizing()
 	local xOfs, yOfs = R:Round(R.UIParent:GetLeft() - UIParent:GetLeft(),R.pix), R:Round(R.UIParent:GetTop() - UIParent:GetTop(),R.pix)
 	local xPos, yPos = R:Round(self:GetLeft(),R.pix), R:Round(self:GetTop(),R.pix)
-	R:Print(xPos, yPos)
 	xPos = xPos - xOfs
 	yPos = yPos + yOfs
-	R:Print(xPos, yPos, xOfs, yOfs)
 
 	R.db.locations[self:GetName()] = {xPos, yPos}
 
