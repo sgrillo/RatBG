@@ -11,7 +11,8 @@ function RBG:BuildNameText(frame)
 
     
     nameText:BuildFont()
-    nameText:SetAllPoints()
+    nameText:SetPoint("TOPLEFT",healthBar,"TOPLEFT")
+    nameText:SetPoint("BOTTOMRIGHT",healthBar,"BOTTOMRIGHT",0,R.pix)
 
     nameText.staticUpdate = RBG.UpdateNameStatic
     R.fontStrings[nameText] = true
@@ -30,10 +31,9 @@ function RBG:UpdateNameStatic(frame)
     --all font changes are handled by Core methods
 
 
-    --self:ClearAllPoints()
-
-    --self:SetPoint("BOTTOMLEFT",healthBar,"BOTTOMLEFT",2,0)
-    --self:SetPoint("TOPRIGHT",healthBar,"RIGHT")
+    self:ClearAllPoints()
+    self:SetPoint("TOPLEFT",healthBar,"TOPLEFT")
+    self:SetPoint("BOTTOMRIGHT",healthBar,"BOTTOMRIGHT",0,R.pix)
 
     --Set Values
     local enemy = RBG.testMode and frame.testenemy or frame.enemy
