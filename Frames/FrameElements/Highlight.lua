@@ -30,9 +30,9 @@ function RBG:UpdateHighlight(frame)
     local enemy = frame:GetEnemy()
 
     if enemy and RBG.db.fapHighlight and enemy.fapTime and enemy.fapTime > servertime() then
-        self:UpdateBorder(RBG.db.borderWidth + 1, T.Media.fapColor, "OVERLAY")
+        self:UpdateBorder(RBG.db.borderWidth, T.Media.fapColor, "OVERLAY")
     elseif enemy and RBG.db.freedomHighlight and enemy.freedomTime and enemy.freedomTime > servertime() then
-        self:UpdateBorder(RBG.db.borderWidth + 1, T.Media.freedomColor, "OVERLAY")
+        self:UpdateBorder(RBG.db.borderWidth, T.Media.freedomColor, "OVERLAY")
     else
         self:UpdateBorder()
     end

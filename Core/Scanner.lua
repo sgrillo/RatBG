@@ -226,9 +226,7 @@ function Scanner:FlagMessage(event, ...)
         ClearFlags()
         local name = select(5,...)
         local frame = RBG.frameNames[name]
-        R:Print(name.." picked up flag")
         if frame and frame.enemy then
-            R:Print(frame:GetName()) 
             frame.enemy.flag = true 
             RBG.pendingUpdate[frame] = true
         end
