@@ -72,7 +72,7 @@ function RBG:UpdatePowerStatic(frame)
 
     --print("powerBar", self:GetName(), "parent", frame)
     rightBox, leftBox = frame.rightBox, frame.leftBox
-    local bottomHeight = R:Round(RBG.powerBarHeight, R.pix)       --Only matters if this is displayed
+    local bottomHeight = RBG.powerBarHeight      --Only matters if this is displayed
 
     local bdColor, bgColor = RBG.db.bdColor, RBG.db.bgColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)

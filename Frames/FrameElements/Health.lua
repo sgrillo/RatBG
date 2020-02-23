@@ -61,7 +61,7 @@ function RBG:UpdateHealthStatic(frame)
     --print("parent dimensions: ", frame:GetWidth(), ", ", frame:GetHeight())
     rightBox, leftBox, border = frame.rightBox, frame.leftBox, RBG.db.borderWidth
     
-    local bottomHeight = frame.powerBar:IsActive() and R:Round(RBG.powerBarHeight - border, R.pix) or 0
+    local bottomHeight = frame.powerBar:IsActive() and (RBG.powerBarHeight - R:Round(border, R.pix)) or 0
 
     local bdColor, bgColor, hpColor = RBG.db.bdColor, RBG.db.bgColor, RBG.db.barColor
     self.background:SetColorTexture(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
