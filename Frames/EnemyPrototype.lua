@@ -37,7 +37,7 @@ function RBG:GenerateEnemy()
     local rfullname = fullnames[rname]
     fullnames[rname] = nil
     tremove(shortnames, ndx)
-    R:Print(rname, rfullname)
+    --R:Print(rname, rfullname)
     local rclass = forceWarlock[rname] and "WARLOCK" or forcePriest[rname] and "PRIEST" or forceDruid[rname] and "DRUID" or forcePaladin[rname] and "PALADIN" or forceHunter[rname] and "HUNTER" or classes[rand(1,#classes)]
     local enemy = 
     {
