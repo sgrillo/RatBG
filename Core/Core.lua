@@ -6,6 +6,8 @@ local gsub, strjoin, twipe, tinsert, tremove, tContains, floor, sign, strupper =
 local AddMessage = AddMessage
 local CreateFrame = CreateFrame
 local IsAddonLoaded = IsAddOnLoaded
+local CreateColor = CreateColor
+local GetClassColor = GetClassColor
 ---Libs---
 local LSM = R.Libs.LSM
 local ACR = R.Libs.AceConfigRegistry
@@ -56,6 +58,7 @@ function R:Initialize()
 	self:HookElvUISkins()			--applies elvui theme to custom widgets for consistency sake
 
 	self:EnableSmoothing()
+	self:SetShamanColor()
 
 	RBG:OnInitialize()
 	Scanner:OnInitialize()
@@ -113,16 +116,22 @@ end
 function R:classColor(class, mult, str)
 	if type(class)~="string" then return end
 	class = strupper(class)
-	--[[ if class == "SHAMAN" then					TURNS OUT I DONT NEED THIS
-		return 1,1,1
-	end ]]
+
+	local r,g,b,hex = GetClassColor(class)
+
 	if str then
-		return _G.RAID_CLASS_COLORS[class].colorStr
+		return hex
 	else
-		if not mult then mult = 1 end
-		local r,g,b = _G.RAID_CLASS_COLORS[class]:GetRGB()
+		mult = mult or 1.0
 		return r*mult, g*mult, b*mult
 	end
+end
+
+--blue shamans
+function R:SetShamanColor(blue)
+	blue = blue or R.global.general.blueShamans
+	_G.RAID_CLASS_COLORS["SHAMAN"] = blue and CreateColor(0.0, 0.44, 0.87) or CreateColor(0.96, 0.55, 0.73)
+	_G.RAID_CLASS_COLORS["SHAMAN"].colorStr = _G.RAID_CLASS_COLORS["SHAMAN"]:GenerateHexColor()
 end
 
 --Return rounded number

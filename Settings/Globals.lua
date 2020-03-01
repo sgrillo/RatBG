@@ -42,7 +42,9 @@ T.general = {
 			WARRIOR = true
 		}
 	},
-	rangeFadeTime = 10
+	rangeFadeTime = 10,
+	rangeFadeAmount = 0.5,
+	blueShamans = true
 }
 
 T.RatBlue = {
