@@ -9,8 +9,8 @@ A.general = {
 
 A.bgFrames = {
 	frameWidth = 200,
-	frameHeight = 30,
-	barSpacing = 1,
+	frameHeight = 25,
+	barSpacing = 0,
 	borderWidth = 1,
 	fullName = true,
 	barColor = {
@@ -50,24 +50,24 @@ A.bgFrames = {
 	trackHealth = true,
 	rangeFade = true,
 	trackPower = "All",
-	powerBarPercent = 0.2,
+	powerBarPercent = 0.25,
 	freedomHighlight = true,
 	fapHighlight = true,
 	targetCount = false,
-	showHeader = true
+	showHeader = false
 }
 
 A.font = {
-	font = "Friz Quadrata TT",
-	size = 12,
+	font = "2002",
+	size = 11,
 	outline = "NONE",
 	justifyV = "MIDDLE",
 	justifyH = "LEFT",
 	spacing = 0.0,
 	color = {
-		r = 0,
-		g = 0,
-		b = 0,
+		r = 1,
+		g = 1,
+		b = 1,
 		a = 1
 	},
 	shadow = {

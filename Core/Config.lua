@@ -130,14 +130,15 @@ R.Options.args.BattlegroundBars = {
 						return 2
 					end
 				},
-				smoothingAmount = {
-					name = "Smoothing Amount",
+				rangeFadeAmount = {
+					name = "Range Fade Amount",
 					type = "range",
+					desc = "How much to fade the frame when the target is out of range",
 					order = 6,
-					min=.20, max=.80, step = .01,
+					min=0.1, max=.90, step = .01,
 					isPercent = true,
-					get = function(info) return R.db.general.smoothingAmount end,
-					set = function(info, value) R.db.general.smoothingAmount = value R.SetSmoothingAmount(value) end
+					get = function(info) return 1.0 - R.global.general.rangeFadeAmount end,
+					set = function(info, value) R.global.general.rangeFadeAmount = 1.0-value end
 				},
 				bdColor = {
 					name = "Border Color",
@@ -383,11 +384,6 @@ R.Options.args.BattlegroundBars = {
 			get = function(info) return R.db.bgFrames[info[#info]] end,
 			set = function(info, value) R.db.bgFrames[info[#info]] = value RBG:UpdateAllStatic() end,
 			args = {
-				showHeader = {
-					order = 1,
-					type = "toggle",
-					name = "Show Header Frame"
-				},
 				updateFreq = {
 					order = 1,
 					type = "range",
@@ -396,7 +392,33 @@ R.Options.args.BattlegroundBars = {
 					min=0.1,max=5,step=0.05,
 					get = function(info) return tonumber(R.db.scanner[info[#info]]) end,
 					set = function(info, value) R.db.scanner[info[#info]] = value end
-				}
+				},
+				smoothingAmount = {
+					name = "Smoothing Amount",
+					type = "range",
+					order = 2,
+					min=.20, max=.80, step = .01,
+					isPercent = true,
+					get = function(info) return R.db.general.smoothingAmount end,
+					set = function(info, value) R.db.general.smoothingAmount = value R.SetSmoothingAmount(value) end
+				},
+				showHeader = {
+					order = 3,
+					type = "toggle",
+					name = "Show Header Frame"
+				},
+				blueShamans = {
+					order = 4,
+					type = "toggle",
+					name = "Blue Shamans",
+					desc = "Uses blue coloring for shamans instead of the original pink",
+					get = function(info) return R.global.general.blueShamans end,
+					set = function(info, value) 
+						R.global.general.blueShamans = value 
+						R:SetShamanColor(value)
+						RBG:UpdateAllStatic() 
+					end
+				},
 			}
 		},
 		blankLine = {
