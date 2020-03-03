@@ -273,7 +273,7 @@ function RBG:UpdateStatic(frame)
     --range fade stuff for test mode
     frame.rangeTime = RBG.testMode and rand(time()-1000, time()+1000) or frame.rangeTime
 
-    RBG.fade(frame, RBG.db.rangeFade and ((time() < frame.rangeTime) and 1 or 0.4) or 1)
+    RBG.fade(frame, RBG.db.rangeFade and ((time() < frame.rangeTime) and 1 or R.global.general.rangeFadeAmount) or 1)
 end
 
 function RBG:UpdateAllStatic()
@@ -290,7 +290,7 @@ function RBG:UpdateAllStatic()
 end
 
 function RBG:UpdateDynamic(frame)
-    if RBG.db.rangeFade then RBG.fade(frame, (time() < frame.rangeTime) and 1 or 0.4) end
+    if RBG.db.rangeFade then RBG.fade(frame, (time() < frame.rangeTime) and 1 or R.global.general.rangeFadeAmount) end
     if RBG.pendingUpdate[frame] then
         for _,element in ipairs(frame.elements) do
             element:updateDynamic(frame)

@@ -15,6 +15,7 @@ local BGSize = {} BGSize["Warsong Gulch"] = 10 BGSize["Arathi Basin"] = 15
 
 function Scanner:CheckZone()
     local zone = GetInstanceInfo()
+    --R:Print(zone)
     if zone == "Warsong Gulch" then
         Scanner.zone = zone
         scanner:SetScript("OnUpdate", Scanner.search) 
