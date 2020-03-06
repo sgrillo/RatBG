@@ -15,9 +15,9 @@ local BGSize = {} BGSize["Warsong Gulch"] = 10 BGSize["Arathi Basin"] = 15
 
 function Scanner:CheckZone()
     local zone = GetInstanceInfo()
+    Scanner.zone = zone
     --R:Print(zone)
     if zone == "Warsong Gulch" then
-        Scanner.zone = zone
         scanner:SetScript("OnUpdate", Scanner.search) 
         Scanner:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "UPDATE_BATTLEFIELD_SCORE")
@@ -32,8 +32,8 @@ function Scanner:CheckZone()
         scanner:SetScript("OnUpdate", nil)
         Scanner:UnregisterEvent("UPDATE_BATTLEFIELD_SCORE")
         Scanner:UnregisterEvent("UPDATE_MOUSEOVER_UNIT")
-        Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagMessage")
-        Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagMessage")
+        Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE")
+        Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_HORDE")
         Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
         Scanner:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     end
