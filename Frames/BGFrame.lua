@@ -1,6 +1,7 @@
 local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
 local RBG = R.bgFrames
+local Scanner = R.scanner
 local LSM = R.Libs.LSM
 
 --Lua functions
@@ -226,7 +227,7 @@ function RBG:Clear()
         frame.enemy = nil
         frame:Hide()
     end
-    if not RBG.db.showHeader then RBG.HeaderFrame:Hide() end
+    if (not RBG.db.showHeader) or (Scanner.zone ~= "Warsong Gulch") then RBG.HeaderFrame:Hide() end
 end
 
 
