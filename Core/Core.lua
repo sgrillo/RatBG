@@ -31,6 +31,7 @@ R.pix = 1
 
 R.bgFrames = {}
 R.scanner = {}
+R.sync = {}
 
 local RBG, Scanner = R.bgFrames, R.scanner
 
