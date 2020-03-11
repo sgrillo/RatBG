@@ -1,8 +1,8 @@
-## Interface: 11303
+## Interface: 11304
 ## Title: Rat BG Targets
 ## Notes: A functioning enemy tracker for Battlegrounds
 ## Author: Rat, with inspiration from BGTargets(kunda, fix by Leming)
-## Version: 11303-1
+## Version: 11304-1
 ## SavedVariables: RatDB
 ## SavedVariablesPerCharacter: RatPrivateDB 
 

@@ -17,7 +17,8 @@ function Scanner:CheckZone()
     local zone = GetInstanceInfo()
     Scanner.zone = zone
     --R:Print(zone)
-    if zone == "Warsong Gulch" then
+    if zone == "Warsong Gulch" or zone == "Arathi Basin" then
+        Scanner.zone = zone
         scanner:SetScript("OnUpdate", Scanner.search) 
         Scanner:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "UPDATE_BATTLEFIELD_SCORE")
@@ -25,6 +26,7 @@ function Scanner:CheckZone()
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagMessage")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagMessage")
         Scanner:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+        Scanner:RegisterEvent("PLAYER_DEAD")
         if RBG.testMode then RBG:TestToggle() end
     else
         R:CancelAllTimers()
@@ -36,6 +38,7 @@ function Scanner:CheckZone()
         Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_HORDE")
         Scanner:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
         Scanner:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+        Scanner:UnregisterEvent("PLAYER_DEAD")
     end
 
 end
@@ -48,42 +51,6 @@ local function GuessAlive(frame)
         enemy.currentMana = enemy.maxMana
         RBG.pendingUpdate[frame] = true 
     end
-end
-
-function Scanner:COMBAT_LOG_EVENT_UNFILTERED()
-    local timestamp, event, _, _, srcName, srcFlags, _, _, destName, destFlags, _, spellID, spellName = CombatLogGetCurrentEventInfo()
-    local strFAP = GetSpellInfo(6615)
-    local strFreedom = GetSpellInfo(1044)
-
-    if bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then              --enemy is the destination, used for buff/debuff tracking
-        local frame = RBG.frameNames[destName]
-        if frame then
-            frame.rangeTime = timestamp + fadetime 
-            if event == "SPELL_AURA_APPLIED" and (spellName == strFAP) then
-                if frame.enemy then
-                    frame.enemy.fapTime = timestamp + 30
-                    RBG.pendingUpdate[frame] = true
-                    frame.fapTimer = R:ScheduleTimer(function() 
-                        RBG.pendingUpdate[frame] = true
-                        RBG:UpdateDynamic(frame) end, 30)
-                end
-            end
-            if event == "SPELL_AURA_REMOVED" and (spellName == strFAP) then
-                if frame.enemy then
-                    frame.enemy.fapTime = 0
-                    RBG.pendingUpdate[frame] = true
-                    if frame.fapTimer then R:CancelTimer(frame.timer) end
-                end
-            end
-        end
-    end
-    if bit.band(srcFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then              --enemy is the source, used for sanity tracking
-        local frame = RBG.frameNames[srcName]
-        if frame and (strmatch(event, "SPELL_CAST") or strmatch(event, "SWING")) then
-            GuessAlive(frame)
-            frame.rangeTime = timestamp + fadetime
-        end   
-    end        
 end
 
 function Scanner:search()
@@ -111,17 +78,11 @@ function Scanner:search()
     Scanner:updateUnits(seen) 
 end
 
-function Scanner:UPDATE_MOUSEOVER_UNIT()
-    local seen = {}
-    Scanner:scanTree("mouseover",seen)
-    Scanner:updateUnits(seen)
-end
-
 function Scanner:updateUnits(seen)
     for name,id in pairs(seen) do
         local frame = RBG.frameNames[name]
         if frame then
-            frame.rangeTime = GetServerTime() + fadetime
+            frame.rangeTime = (UnitHealth(id) > 0) and (GetServerTime() + fadetime) or 0            --not targetable if they're dead
             local enemy = RBG.frameNames[name].enemy
             if enemy then
                 --print("found enemy: "..name) 
@@ -151,6 +112,33 @@ function Scanner:scanTree(unitID, seen)
         seen[name] = unitID
     end
     Scanner:scanTree(unitID.."target", seen)
+end
+
+local function ClearFlags()
+    for i,enemy in ipairs(RBG.enemies) do
+        if enemy.flag then 
+            enemy.flag = false
+            RBG.pendingUpdate[RBG.frames[i]] = true
+        end
+    end
+end
+
+function Scanner:FlagMessage(event, ...)
+    local friendly, msg = strmatch(event, strupper(R.myfaction)), select(1,...)
+    if msg and strmatch(msg, "captured") then
+        ClearFlags()
+    elseif friendly and msg and strmatch(msg, "dropped") then
+        ClearFlags()
+    elseif not friendly and msg and strmatch(msg, "picked up") then
+        ClearFlags()
+        local name = select(5,...)
+        local frame = RBG.frameNames[name]
+        if frame and frame.enemy then
+            frame.enemy.flag = true 
+            RBG.pendingUpdate[frame] = true
+        end
+        GuessAlive(frame)
+    end
 end
 
 --check the scoreboard for enemies 
@@ -204,35 +192,67 @@ function Scanner:UPDATE_BATTLEFIELD_SCORE()
     end
 end
 
+function Scanner:UPDATE_MOUSEOVER_UNIT()
+    local seen = {}
+    Scanner:scanTree("mouseover",seen)
+    Scanner:updateUnits(seen)
+end
+
+function Scanner:COMBAT_LOG_EVENT_UNFILTERED()
+    local timestamp, event, _, _, srcName, srcFlags, _, _, destName, destFlags, _, spellID, spellName = CombatLogGetCurrentEventInfo()
+    local strFAP = GetSpellInfo(6615)
+    local strFreedom = GetSpellInfo(1044)
+
+    if bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then              --enemy is the destination, used for buff/debuff tracking
+        local frame = RBG.frameNames[destName]
+        if frame then
+            frame.rangeTime = timestamp + fadetime 
+            if event == "SPELL_AURA_APPLIED" and (spellName == strFAP) then
+                if frame.enemy then
+                    frame.enemy.fapTime = timestamp + 30
+                    RBG.pendingUpdate[frame] = true
+                    frame.fapTimer = R:ScheduleTimer(function() 
+                        RBG.pendingUpdate[frame] = true
+                        RBG:UpdateDynamic(frame) end, 30)
+                end
+            end
+            if event == "SPELL_AURA_REMOVED" and (spellName == strFAP) then
+                if frame.enemy then
+                    frame.enemy.fapTime = 0
+                    RBG.pendingUpdate[frame] = true
+                    if frame.fapTimer then R:CancelTimer(frame.fapTimer) end
+                end
+            end
+            if event == "UNIT_DIED" then
+                frame.rangeTime = 0
+                if frame.enemy then
+                    frame.enemy.currentHealth = 0
+                    frame.enemy.currentMana = 0
+                    frame.enemy.currentPower = 0
+                    if frame.fapTimer then R:CancelTimer(frame.fapTimer) end
+                end
+                RBG.pendingUpdate[frame] = true
+            end
+        end
+    end
+    if bit.band(srcFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then              --enemy is the source, used for sanity tracking
+        local frame = RBG.frameNames[srcName]
+        if frame and (strmatch(event, "SPELL_CAST") or strmatch(event, "SWING")) then
+            GuessAlive(frame)
+            frame.rangeTime = timestamp + fadetime
+        end   
+    end        
+end
+
+function Scanner:PLAYER_DEAD()
+    --clear the range flags for all enemies when dead
+    for frame in pairs(RBG.activeFrames) do
+        frame.rangeTime = 0
+    end
+end
+
 function Scanner:PLAYER_REGEN_ENABLED()
     Scanner:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
-end
-
-local function ClearFlags()
-    for i,enemy in ipairs(RBG.enemies) do
-        if enemy.flag then 
-            enemy.flag = false
-            RBG.pendingUpdate[RBG.frames[i]] = true
-        end
-    end
-end
-
-function Scanner:FlagMessage(event, ...)
-    local friendly, msg = strmatch(event, strupper(R.myfaction)), select(1,...)
-    if msg and strmatch(msg, "captured") then
-        ClearFlags()
-    elseif friendly and msg and strmatch(msg, "dropped") then
-        ClearFlags()
-    elseif not friendly and msg and strmatch(msg, "picked up") then
-        ClearFlags()
-        local name = select(5,...)
-        local frame = RBG.frameNames[name]
-        if frame and frame.enemy then
-            frame.enemy.flag = true 
-            RBG.pendingUpdate[frame] = true
-        end
-        GuessAlive(frame)
-    end
 end
 
 function Scanner:OnInitialize()
