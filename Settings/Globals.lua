@@ -2,7 +2,7 @@ local R, A, T = unpack(select(2, ...)); --Import: Engine, Profile DB, Global DB
 
 --Global Settings
 T.general = {
-	version = 1.01,
+	version = 1.02,
 	AceGUI = {
 		width = 800,
 		height = 1000
