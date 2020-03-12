@@ -216,11 +216,27 @@ function Scanner:COMBAT_LOG_EVENT_UNFILTERED()
                         RBG:UpdateDynamic(frame) end, 30)
                 end
             end
+            if event == "SPELL_AURA_APPLIED" and (spellName == strFreedom) then
+                if frame.enemy then
+                    frame.enemy.freedomTime = timestamp + 30
+                    RBG.pendingUpdate[frame] = true
+                    frame.freedomTimer = R:ScheduleTimer(function() 
+                        RBG.pendingUpdate[frame] = true
+                        RBG:UpdateDynamic(frame) end, 30)
+                end
+            end
             if event == "SPELL_AURA_REMOVED" and (spellName == strFAP) then
                 if frame.enemy then
                     frame.enemy.fapTime = 0
                     RBG.pendingUpdate[frame] = true
                     if frame.fapTimer then R:CancelTimer(frame.fapTimer) end
+                end
+            end
+            if event == "SPELL_AURA_REMOVED" and (spellName == strFreedom) then
+                if frame.enemy then
+                    frame.enemy.freedomTime = 0
+                    RBG.pendingUpdate[frame] = true
+                    if frame.freedomTimer then R:CancelTimer(frame.freedomTimer) end
                 end
             end
             if event == "UNIT_DIED" then
@@ -230,6 +246,7 @@ function Scanner:COMBAT_LOG_EVENT_UNFILTERED()
                     frame.enemy.currentMana = 0
                     frame.enemy.currentPower = 0
                     if frame.fapTimer then R:CancelTimer(frame.fapTimer) end
+                    if frame.freedomTimer then R:CancelTimer(frame.freedomTimer) end
                 end
                 RBG.pendingUpdate[frame] = true
             end

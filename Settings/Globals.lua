@@ -7,7 +7,7 @@ T.general = {
 		width = 800,
 		height = 1000
 	},
-	maxFrames = 15,
+	maxFrames = 40,
 	powerColors = {
 		MANA = {
 			r = 79.0/255,
