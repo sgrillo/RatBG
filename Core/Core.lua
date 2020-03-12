@@ -59,7 +59,6 @@ function R:Initialize()
 	self:HookElvUISkins()			--applies elvui theme to custom widgets for consistency sake
 
 	self:EnableSmoothing()
-	self:SetShamanColor()
 
 	RBG:OnInitialize()
 	Scanner:OnInitialize()
@@ -120,19 +119,18 @@ function R:classColor(class, mult, str)
 
 	local r,g,b,hex = GetClassColor(class)
 
+	if class == "SHAMAN" then
+		local color = R.global.general.blueShamans and CreateColor(0.0, 0.44, 0.87) or CreateColor(0.96, 0.55, 0.73)
+		hex = color:GenerateHexColor()
+		r,g,b = color:GetRGB()
+	end
+		
 	if str then
 		return hex
 	else
 		mult = mult or 1.0
 		return r*mult, g*mult, b*mult
 	end
-end
-
---blue shamans
-function R:SetShamanColor(blue)
-	blue = blue or R.global.general.blueShamans
-	_G.RAID_CLASS_COLORS["SHAMAN"] = blue and CreateColor(0.0, 0.44, 0.87) or CreateColor(0.96, 0.55, 0.73)
-	_G.RAID_CLASS_COLORS["SHAMAN"].colorStr = _G.RAID_CLASS_COLORS["SHAMAN"]:GenerateHexColor()
 end
 
 --Return rounded number
@@ -245,7 +243,7 @@ local function BumpFrame(self)
 end
 
 --Add mover to frame--
-function R:MakeDraggable(frame)
+function R:BuildDragOverlay(frame)
 	frame.defaultPosition = {}
 	local defaultPosition = frame.defaultPosition
 	defaultPosition.point, defaultPosition.relativeTo, defaultPosition.relativePoint, defaultPosition.xOfs, defaultPosition.yOfs = frame:GetPoint()
@@ -261,7 +259,6 @@ function R:MakeDraggable(frame)
 	moverFrame:SetScript("OnDragStop", function(self)
 		--self:GetParent():StopMovingOrSizing()
 		BumpFrame(self:GetParent())
-		
 	end)
 
 

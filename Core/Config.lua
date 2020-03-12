@@ -414,8 +414,7 @@ R.Options.args.BattlegroundBars = {
 					desc = "Uses blue coloring for shamans instead of the original pink",
 					get = function(info) return R.global.general.blueShamans end,
 					set = function(info, value) 
-						R.global.general.blueShamans = value 
-						R:SetShamanColor(value)
+						R.global.general.blueShamans = value
 						RBG:UpdateAllStatic() 
 					end
 				},

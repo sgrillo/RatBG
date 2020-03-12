@@ -44,7 +44,7 @@ function RBG:BuildHeader()
     else
         ParentFrame:SetPoint("CENTER",R.UIParent,"CENTER",0,0)
     end
-    R:MakeDraggable(ParentFrame)
+    R:BuildDragOverlay(ParentFrame)
     R.fontStrings[ParentFrame.title] = true
 
     ParentFrame:Hide()
