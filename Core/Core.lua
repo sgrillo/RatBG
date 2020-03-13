@@ -97,7 +97,8 @@ end
 ---Utility Functions---
 
 function R:PixelScale()
-	R.pix = (768.0/string.match(({GetScreenResolutions()})[GetCurrentResolution()], "%d+x(%d+)"))/0.64    --GetCVar("uiScale")
+	local _, screenHeight = GetPhysicalScreenSize()
+	R.pix = (768.0/screenHeight)/0.64    --GetCVar("uiScale")
 end
 
 --Enable Smoothing--
