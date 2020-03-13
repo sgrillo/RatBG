@@ -62,6 +62,8 @@ function R:Initialize()
 
 	RBG:OnInitialize()
 	Scanner:OnInitialize()
+
+	R:Print("Welcome to RatBG! Type /rbg or /ratbg to open the options menu.")
 end
 
 function R:UpdateAll()
