@@ -172,8 +172,8 @@ function RBG:AddEnemy(enemy)
 end
 
 function RBG:Evict(enemy)
-    for i,e in pairs(RBG.enemies) do
-        if e == enemy then
+    for i,e in ipairs(RBG.enemies) do
+        if e.fullname == enemy.fullname then
             tremove(RBG.enemies, i)
             RBG.frameNames[enemy.fullname] = nil
             return
@@ -243,6 +243,7 @@ end
 function RBG:ActivateFrame(frame)
     RBG.activeFrames[frame] = true
     frame.active = true
+    frame:Show()
 end
 
 function RBG:ActivateNextFrame()

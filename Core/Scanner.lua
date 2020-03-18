@@ -21,7 +21,7 @@ function Scanner:CheckZone()
         Scanner.zone = zone
         scanner:SetScript("OnUpdate", Scanner.search) 
         Scanner:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
-        Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "UPDATE_BATTLEFIELD_SCORE")
+        Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", Scanner.UPDATE_BATTLEFIELD_SCORE)
         Scanner:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagMessage")
         Scanner:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagMessage")
@@ -102,7 +102,7 @@ function Scanner:updateUnits(seen)
 end
 
 function Scanner:scanTree(unitID, seen)
-    if not UnitIsVisible(unitID) or UnitIsFriend(unitID, "player") then
+    if (not UnitIsVisible(unitID)) or UnitIsFriend(unitID, "player") then
         return
     end
     if UnitIsPlayer(unitID) then
@@ -144,14 +144,10 @@ end
 --check the scoreboard for enemies 
 function Scanner:UPDATE_BATTLEFIELD_SCORE()
     if InCombatLockdown() then
-        Scanner:UnregisterEvent("UPDATE_BATTLEFIELD_SCORE")
-        Scanner:RegisterEvent("PLAYER_REGEN_ENABLED")
         return
     end
 
     local found, exists = false, {} 
-
-
     for _,enemy in pairs(RBG.enemies) do
         exists[enemy.fullname] = true
     end
@@ -266,10 +262,6 @@ function Scanner:PLAYER_DEAD()
     for frame in pairs(RBG.activeFrames) do
         frame.rangeTime = 0
     end
-end
-
-function Scanner:PLAYER_REGEN_ENABLED()
-    Scanner:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
 end
 
 function Scanner:OnInitialize()
