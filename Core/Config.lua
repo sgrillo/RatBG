@@ -292,11 +292,6 @@ R.Options.args.BattlegroundBars = {
 					name = "Class Icon",
 					type = "toggle"
 				},
-				rankIcon = {
-					order = 1,
-					name = "Rank Icon",
-					type = "toggle"
-				},
 				trinketIcon = {
 					order = 3,
 					name = "Trinket Icon",
