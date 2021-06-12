@@ -11,13 +11,13 @@ Scanner.frame = CreateFrame("Frame")
 
 local scanner, scoreTimer, updateTimer = Scanner.frame, 0, 0
 
-local BGSize = {} BGSize["Warsong Gulch"] = 10 BGSize["Arathi Basin"] = 15
+local BGSize = {} BGSize["Warsong Gulch"] = 10 BGSize["Arathi Basin"] = 15 BGSize["Eye of the Storm"] = 15
 
 function Scanner:CheckZone()
     local zone = GetInstanceInfo()
     Scanner.zone = zone
     --R:Print(zone)
-    if zone == "Warsong Gulch" or zone == "Arathi Basin" then
+    if zone == "Warsong Gulch" or zone == "Arathi Basin" or zone == "Eye of the Storm" then
         Scanner.zone = zone
         scanner:SetScript("OnUpdate", Scanner.search) 
         Scanner:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")

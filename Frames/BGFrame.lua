@@ -78,7 +78,6 @@ function RBG:BuildFrame(name)
     frame.powerBar = RBG:BuildPowerBar(frame)
     frame.Name = RBG:BuildNameText(frame)
     frame.flag = RBG:BuildFlag(frame)
-    frame.leftBox.Rank = RBG:BuildRank(frame)
     frame.leftBox.Class = RBG:BuildClassIcon(frame)
     --frame.rightBox.Trinket = RBG:BuildTrinketIcon(frame)
     --frame.rightBox.Skull = RBG:BuildSkullIcon(frame)
@@ -182,7 +181,7 @@ function RBG:Evict(enemy)
 end
 
 --Temp sort order--
-local sortOrder = {"class","name","rank"}
+local sortOrder = {"class","name"}
 
 local function Compare(a, b, level)
     local level = level or 1
@@ -190,14 +189,18 @@ local function Compare(a, b, level)
         return Compare(a, b, level+1)
     elseif sortOrder[level]=="class" then
         return T.SortOrder[a.class] < T.SortOrder[b.class]
-    elseif sortOrder[level]=="rank" then
-        return a.rank >= b.rank
     else
         return a[sortOrder[level]] <= b[sortOrder[level]]
     end
 end
 
 function RBG:AssignEnemies(num)
+
+    if InCombatLockdown then
+        RBG:RegisterEvent("PLAYER_REGEN_ENABLED", "AssignEnemies", num) 
+    end
+    RBG:UnregisterEvent("PLAYER_REGEN_ENABLED")
+    RBG:BuildGroup()
 
     local table = (RBG.testMode and "test" or "") .. "enemies"
     local field = (RBG.testMode and "test" or "") .. "enemy"
