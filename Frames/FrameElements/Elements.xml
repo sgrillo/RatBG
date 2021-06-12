@@ -4,7 +4,6 @@
   <Script file="Class.lua"/>
   <Script file="Name.lua"/>
   <Script file="Power.lua"/>
-  <Script file="Rank.lua"/>
   <Script file="Skull.lua"/>
   <Script file="TargetCount.lua"/>
   <Script file="Trinket.lua"/>
