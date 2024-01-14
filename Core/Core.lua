@@ -279,7 +279,6 @@ function R:BuildDragOverlay(frame)
 	frame.lock = function(self)
 		self.moverFrame:Hide()
 		self.moverFrame:EnableMouse(false)
-		self.moverFrame:RegisterForDrag(nil)
 	end
 
 	frame.reset = function(self)
