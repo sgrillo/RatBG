@@ -157,8 +157,9 @@ function Addon:UpdateConfigSize(reset)
 	if not frame then return end
 
 	local maxWidth, maxHeight = self.UIParent:GetSize()
-	frame:SetMinResize(600, 500)
-	frame:SetMaxResize(maxWidth-50, maxHeight-50)
+	frame:SetResizeBounds(600,500,maxWidth-50,maxHeight-50)
+	--frame:SetMinResize(600, 500)
+	--frame:SetMaxResize(maxWidth-50, maxHeight-50)
 
 	self.Libs.AceConfigDialog:SetDefaultSize(AddonName, self:GetConfigDefaultSize())
 
