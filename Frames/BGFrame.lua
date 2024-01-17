@@ -172,9 +172,9 @@ end
 
 function RBG:Evict(enemy)
     for i,e in ipairs(RBG.enemies) do
-        if e.fullname == enemy.fullname then
+        if e.fullname == enemy then
             tremove(RBG.enemies, i)
-            RBG.frameNames[enemy.fullname] = nil
+            RBG.frameNames[enemy] = nil
             return
         end
     end
@@ -196,11 +196,12 @@ end
 
 function RBG:AssignEnemies(num)
 
-    if InCombatLockdown then
-        RBG:RegisterEvent("PLAYER_REGEN_ENABLED", "AssignEnemies", num) 
+    if InCombatLockdown() then
+        RBG:RegisterEvent("PLAYER_REGEN_ENABLED", "AssignEnemies", num)
+        return 
     end
     RBG:UnregisterEvent("PLAYER_REGEN_ENABLED")
-    RBG:BuildGroup()
+    --RBG:BuildGroup()
 
     local table = (RBG.testMode and "test" or "") .. "enemies"
     local field = (RBG.testMode and "test" or "") .. "enemy"
