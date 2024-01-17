@@ -152,7 +152,11 @@ function Scanner:UPDATE_BATTLEFIELD_SCORE()
         exists[enemy.fullname] = true
     end
     
-    for i=1,GetNumBattlefieldScores() do
+    local num_combatants = GetNumBattlefieldScores()
+
+    for i=1,num_combatants do
+        if not num_combatants == 20 then print(num_combatants) end
+
         local pname, _, _, _, _, pfaction, prank, _, _, pclass = GetBattlefieldScore(i)
         if pname then                                        --handle those stupid broken names
             if pfaction ~= R.myFactionID then
